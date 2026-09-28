@@ -1,3 +1,20 @@
 spring:
   application:
-    name: backend
+    name: finsight-backend
+
+  ai:
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        chat:
+          options:
+            model: gemini-3.8-flash
+    retry:
+      max-attempts: 5
+      backoff:
+        initial-interval: 2000ms
+        multiplier: 2.0
+        max-interval: 10000ms
+
+server:
+  port: 8080
