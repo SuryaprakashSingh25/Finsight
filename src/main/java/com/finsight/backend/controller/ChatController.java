@@ -1,6 +1,6 @@
 package com.finsight.backend.controller;
 
-import com.finsight.backend.service.ChatService;
+import com.finsight.backend.service.AIService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,19 +11,20 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
-    private final ChatService chatService;
+    private final AIService aiService;
 
-    public ChatController(ChatService chatService){
-        this.chatService=chatService;
+    public ChatController(AIService aiService){
+        this.aiService=aiService;
     }
 
     @PostMapping
     public Map<String,String> chat(@RequestBody Map<String,String> request){
         String message=request.get("message");
-        String response=chatService.chat(message);
+        String response=aiService.generate(message);
 
         return Map.of(
-                "response", response
+                "response", response,
+                "provider", aiService.getProviderName()
         );
     }
 }
