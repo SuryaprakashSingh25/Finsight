@@ -1,6 +1,6 @@
 package com.finsight.backend.controller;
 
-import org.springframework.ai.chat.client.ChatClient;
+import com.finsight.backend.service.ChatService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,20 +11,16 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
-    private final ChatClient chatClient;
+    private final ChatService chatService;
 
-    public ChatController(ChatClient.Builder chatClientBuilder){
-        this.chatClient=chatClientBuilder.build();
+    public ChatController(ChatService chatService){
+        this.chatService=chatService;
     }
 
     @PostMapping
     public Map<String,String> chat(@RequestBody Map<String,String> request){
         String message=request.get("message");
-        String response=chatClient
-                .prompt()
-                .user(message)
-                .call()
-                .content();
+        String response=chatService.chat(message);
 
         return Map.of(
                 "response", response
