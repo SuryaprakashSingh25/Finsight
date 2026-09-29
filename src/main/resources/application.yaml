@@ -21,5 +21,10 @@ openrouter:
   base-url: https://openrouter.ai/api/v1
   model: openrouter/free
 
+groq:
+  api-key: ${GROQ_API_KEY}
+  base-url: https://api.groq.com/openai/v1
+  model: openai/gpt-oss-120b
+
 server:
   port: 8080

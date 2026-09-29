@@ -20,19 +20,24 @@ public class ModelRouter {
     }
 
     public AIResponse generateWithFallback(String prompt){
-        AIProvider primary=getProvider("gemini");
-        try{
-            return new AIResponse(
-                    primary.generate(prompt),
-                    primary.getProviderName()
-            );
+        List<String> providerOrder=List.of(
+                "openrouter",
+                "groq",
+                "gemini"
+        );
+        Exception lastException=null;
+        for(String providerName: providerOrder){
+            AIProvider provider=getProvider(providerName);
+            try{
+                String response=provider.generate(prompt);
+                return new AIResponse(
+                        response,
+                        provider.getProviderName()
+                );
+            } catch (Exception exception){
+                lastException=exception;
+            }
         }
-        catch (Exception primaryException){
-            AIProvider fallback=getProvider("openrouter");
-            return new AIResponse(
-                    fallback.generate(prompt),
-                    fallback.getProviderName()
-            );
-        }
+        throw new IllegalStateException("All AI providers failed", lastException);
     }
 }
