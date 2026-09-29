@@ -1,5 +1,6 @@
 package com.finsight.backend.controller;
 
+import com.finsight.backend.ai.AIResponse;
 import com.finsight.backend.service.AIService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,11 +21,11 @@ public class ChatController {
     @PostMapping
     public Map<String,String> chat(@RequestBody Map<String,String> request){
         String message=request.get("message");
-        String response=aiService.generate(message);
+        AIResponse aiResponse=aiService.generate(message);
 
         return Map.of(
-                "response", response,
-                "provider", aiService.getProviderName()
+                "response", aiResponse.response(),
+                "provider", aiResponse.provider()
         );
     }
 }

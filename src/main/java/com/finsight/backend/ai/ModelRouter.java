@@ -12,10 +12,27 @@ public class ModelRouter {
         this.providers=providers;
     }
 
-    public AIProvider getDefaultProvider(){
+    public AIProvider getProvider(String providerName){
         return providers.stream()
-                .filter(provider -> provider.getProviderName().equals("gemini"))
+                .filter(provider -> provider.getProviderName().equalsIgnoreCase(providerName))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Gemini provider not available"));
+                .orElseThrow(() -> new IllegalStateException("AI provider not available: "+providerName));
+    }
+
+    public AIResponse generateWithFallback(String prompt){
+        AIProvider primary=getProvider("gemini");
+        try{
+            return new AIResponse(
+                    primary.generate(prompt),
+                    primary.getProviderName()
+            );
+        }
+        catch (Exception primaryException){
+            AIProvider fallback=getProvider("openrouter");
+            return new AIResponse(
+                    fallback.generate(prompt),
+                    fallback.getProviderName()
+            );
+        }
     }
 }
