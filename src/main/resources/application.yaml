@@ -16,5 +16,10 @@ spring:
         multiplier: 2.0
         max-interval: 10000ms
 
+openrouter:
+  api-key: ${OPENROUTER_API_KEY}
+  base-url: https://openrouter.ai/api/v1
+  model: openrouter/free
+
 server:
   port: 8080
