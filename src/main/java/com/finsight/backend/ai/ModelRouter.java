@@ -1,11 +1,14 @@
 package com.finsight.backend.ai;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class ModelRouter {
+    private static final Logger log = LoggerFactory.getLogger(ModelRouter.class);
     private final List<AIProvider> providers;
 
     public ModelRouter(List<AIProvider> providers){
@@ -28,13 +31,16 @@ public class ModelRouter {
         Exception lastException=null;
         for(String providerName: providerOrder){
             AIProvider provider=getProvider(providerName);
+            log.info("Trying AI provider: {}",providerName);
             try{
                 String response=provider.generate(prompt);
+                log.info("AI provider succeeded: {}",providerName);
                 return new AIResponse(
                         response,
                         provider.getProviderName()
                 );
             } catch (Exception exception){
+                log.warn("AI provider failed: {} - {}",providerName,exception.getMessage());
                 lastException=exception;
             }
         }
