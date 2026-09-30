@@ -1,6 +1,7 @@
 package com.finsight.backend.ai;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -44,6 +45,18 @@ public class GroqAIProvider implements AIProvider{
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(requestBody)
                 .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        (request, resp) -> {
+                            int statusCode = resp.getStatusCode().value();
+                            boolean retryable = statusCode == 429 || statusCode >= 500;
+                            throw new AIProviderException(
+                                    "groq",
+                                    statusCode,
+                                    retryable,
+                                    "Groq request failed with status " + statusCode
+                            );
+                        })
                 .body(Map.class);
 
         return extractResponse(response);

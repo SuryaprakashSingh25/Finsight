@@ -39,8 +39,22 @@ public class ModelRouter {
                         response,
                         provider.getProviderName()
                 );
+            } catch (AIProviderException exception){
+                log.warn(
+                        "AI provider failed: {} status={} retryable={}",
+                        exception.getProvider(),
+                        exception.getStatusCode(),
+                        exception.isRetryable());
+                lastException=exception;
+                if(!exception.isRetryable()){
+                    throw exception;
+                }
             } catch (Exception exception){
-                log.warn("AI provider failed: {} - {}",providerName,exception.getMessage());
+                log.warn(
+                        "Unexpected failure from AI provider: {} - {}",
+                        providerName,
+                        exception.getMessage()
+                );
                 lastException=exception;
             }
         }
