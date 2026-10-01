@@ -2,6 +2,11 @@ spring:
   application:
     name: finsight-backend
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/finsight
+    username: finsight
+    password: finsight
+
   ai:
     google:
       genai:
@@ -16,6 +21,10 @@ spring:
         multiplier: 2.0
         max-interval: 10000ms
 
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+
 openrouter:
   api-key: ${OPENROUTER_API_KEY}
   base-url: https://openrouter.ai/api/v1
@@ -25,6 +34,11 @@ groq:
   api-key: ${GROQ_API_KEY}
   base-url: https://api.groq.com/openai/v1
   model: openai/gpt-oss-120b
+
+voyage:
+  api-key: ${VOYAGE_API_KEY}
+  base-url: https://api.voyageai.com/v1
+  model: voyage-4-lite
 
 server:
   port: 8080
