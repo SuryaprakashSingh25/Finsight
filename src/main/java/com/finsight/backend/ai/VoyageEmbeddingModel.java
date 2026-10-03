@@ -9,10 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Component
+//@Component
 public class VoyageEmbeddingModel implements EmbeddingModel {
     private final RestClient restClient;
     private final String apiKey;
@@ -62,17 +63,18 @@ public class VoyageEmbeddingModel implements EmbeddingModel {
             throw new IllegalStateException("Voyage returned no embedding data");
         }
 
-        List<Embedding> embeddings=data.stream()
-                .map(item -> {
-                    Map<?,?> dataItem=(Map<?, ?>) item;
-                    List<?> values=(List<?>) dataItem.get("embedding");
-                    float[] vector=new float[values.size()];
-                    for(int i=0;i<values.size();i++){
-                        vector[i]=((Number) values.get(i)).floatValue();
-                    }
-                    Integer index=((Number) dataItem.get("index")).intValue();
-                    return new Embedding(vector,index);
-                }).toList();
+        List<Embedding> embeddings=new ArrayList<>();
+        for(Object item:data){
+            Map<?,?> dataItem=(Map<?, ?>) item;
+            List<?> values=(List<?>) dataItem.get("embedding");
+            float[] vector=new float[values.size()];
+            for(int i=0;i<values.size();i++){
+                vector[i]=((Number) values.get(i)).floatValue();
+            }
+            int index=((Number) dataItem.get("index")).intValue();
+
+            embeddings.add(new Embedding(vector,index));
+        }
         return new EmbeddingResponse(embeddings);
     }
 }
