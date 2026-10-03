@@ -20,19 +20,23 @@ public class RagService {
         this.modelRouter = modelRouter;
     }
 
-    public AIResponse answer(String question) {
+    public RAGResponse answer(String question) {
 
         List<Document> documents = vectorStore.similaritySearch(question);
 
         if (documents == null || documents.isEmpty()) {
-            return new AIResponse(
+            return new RAGResponse(
                     "I could not find relevant information in the available documents.",
-                    "none"
+                    null,
+                    List.of()
             );
         }
 
-        String context = documents.stream()
+        List<Document> relevantDocuments=documents.stream()
                 .limit(5)
+                .toList();
+
+        String context = relevantDocuments.stream()
                 .map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
@@ -54,6 +58,28 @@ public class RagService {
                 %s
                 """.formatted(context, question);
 
-        return modelRouter.generateWithFallback(prompt);
+        AIResponse aiResponse=modelRouter.generateWithFallback(prompt);
+
+        List<SourceReference> sources=relevantDocuments.stream()
+                .map(document -> new SourceReference(
+                        (String) document.getMetadata().get("document"),
+                        getIntegerMetadata(document,"page"),
+                        getIntegerMetadata(document,"chunk_index")
+                ))
+                .toList();
+
+        return new RAGResponse(
+                aiResponse.response(),
+                aiResponse.provider(),
+                sources
+        );
+    }
+
+    private Integer getIntegerMetadata(Document document, String key){
+        Object value=document.getMetadata().get(key);
+        if(value instanceof Number number){
+            return number.intValue();
+        }
+        return null;
     }
 }

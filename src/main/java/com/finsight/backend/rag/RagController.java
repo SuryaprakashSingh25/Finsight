@@ -17,7 +17,7 @@ public class RagController {
     }
 
     @GetMapping
-    public AIResponse ask(@RequestParam String question) {
+    public RAGResponse ask(@RequestParam String question) {
         return ragService.answer(question);
     }
 }
