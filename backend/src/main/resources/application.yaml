@@ -11,6 +11,13 @@ spring:
     model:
       embedding: ollama
 
+    mcp:
+      client:
+        streamable-http:
+          connections:
+            finsight-mcp:
+              url: http://localhost:8081
+
     ollama:
       base-url: http://localhost:11434
       embedding:
