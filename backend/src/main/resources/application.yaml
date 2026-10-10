@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: finsight-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/finsight
+    username: finsight
+    password: finsight
+
+  ai:
+    model:
+      embedding: ollama
+      chat: openai
+
+    openai:
+      base-url: https://openrouter.ai/api
+      api-key: ${OPENROUTER_API_KEY}
+      chat:
+        options:
+          model: openrouter/free
+
+
+    mcp:
+      client:
+        streamable-http:
+          connections:
+            finsight-mcp:
+              url: http://localhost:8081
+
+    ollama:
+      base-url: http://localhost:11434
+      embedding:
+        model: nomic-embed-text
+
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        chat:
+          options:
+            model: gemini-3.8-flash
+    retry:
+      max-attempts: 5
+      backoff:
+        initial-interval: 2000ms
+        multiplier: 2.0
+        max-interval: 10000ms
+
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+
+openrouter:
+  api-key: ${OPENROUTER_API_KEY}
+  base-url: https://openrouter.ai/api/v1
+  model: openrouter/free
+
+groq:
+  api-key: ${GROQ_API_KEY}
+  base-url: https://api.groq.com/openai/v1
+  agent-base-url: https://api.groq.com/openai
+  model: openai/gpt-oss-120b
+
+voyage:
+  api-key: ${VOYAGE_API_KEY}
+  base-url: https://api.voyageai.com/v1
+  model: voyage-4-lite
+
+server:
+  port: 8080

@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: mcp-server
+
+  ai:
+    mcp:
+      server:
+        protocol: STREAMABLE
+        name: finsight-mcp-server
+        version: 1.0.0
+        streamable-http:
+          mcp-endpoint: /mcp
+
+server:
+  port: 8081
