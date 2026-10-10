@@ -1,11 +1,15 @@
 package com.finsight.mcp_server.tools;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springaicommunity.mcp.annotation.McpTool;
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CalculatorTool {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(CalculatorTool.class);
 
     @McpTool(
             name = "percentageGrowth",
@@ -15,6 +19,12 @@ public class CalculatorTool {
             double current,
             double previous
     ) {
+        log.info(
+                "MCP TOOL INVOKED: percentageGrowth(current={}, previous={})",
+                current,
+                previous
+        );
+
         if (previous == 0) {
             throw new IllegalArgumentException(
                     "Previous value cannot be zero"

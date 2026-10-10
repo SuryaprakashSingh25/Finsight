@@ -10,6 +10,15 @@ spring:
   ai:
     model:
       embedding: ollama
+      chat: openai
+
+    openai:
+      base-url: https://openrouter.ai/api
+      api-key: ${OPENROUTER_API_KEY}
+      chat:
+        options:
+          model: openrouter/free
+
 
     mcp:
       client:
@@ -22,6 +31,7 @@ spring:
       base-url: http://localhost:11434
       embedding:
         model: nomic-embed-text
+
     google:
       genai:
         api-key: ${GEMINI_API_KEY}
@@ -47,6 +57,7 @@ openrouter:
 groq:
   api-key: ${GROQ_API_KEY}
   base-url: https://api.groq.com/openai/v1
+  agent-base-url: https://api.groq.com/openai
   model: openai/gpt-oss-120b
 
 voyage:

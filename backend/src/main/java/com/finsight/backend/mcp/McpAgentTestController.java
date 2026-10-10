@@ -18,7 +18,7 @@ public class McpAgentTestController {
     }
 
     @GetMapping
-    public String ask(@RequestParam String question) {
+    public AgentResult ask(@RequestParam String question) {
         return mcpAgentService.ask(question);
     }
 }

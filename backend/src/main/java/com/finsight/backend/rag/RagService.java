@@ -82,4 +82,34 @@ public class RagService {
         }
         return null;
     }
+
+    public RagContext retrieve(String question){
+        List<Document> documents=vectorStore.similaritySearch(question);
+        if(documents==null || documents.isEmpty()){
+            return new RagContext(
+                    "",
+                    List.of()
+            );
+        }
+
+        List<Document> relevantDocuments=documents.stream()
+                .limit(5)
+                .toList();
+
+        String context=relevantDocuments.stream()
+                .map(Document::getText)
+                .collect(Collectors.joining("\n\n---\n\n"));
+
+        List<SourceReference> sources=relevantDocuments.stream()
+                .map(document -> new SourceReference(
+                        (String) document.getMetadata().get("document"),
+                        getIntegerMetadata(document,"page"),
+                        getIntegerMetadata(document,"chunk_index")
+                )).toList();
+
+        return new RagContext(
+                context,
+                sources
+        );
+    }
 }
