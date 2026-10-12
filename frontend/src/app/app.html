@@ -1,0 +1,230 @@
+<div class="app-shell" [class.sidebar-collapsed]="sidebarCollapsed">
+
+  <aside class="sidebar">
+    <a class="brand" href="#" (click)="$event.preventDefault(); selectPage('Overview')">
+      <span class="brand-mark">F</span>
+      <span class="brand-copy">
+        <strong>FinSight</strong>
+        <small>FINANCIAL INTELLIGENCE</small>
+      </span>
+    </a>
+
+    <div class="workspace-label">WORKSPACE</div>
+
+    <nav class="navigation">
+      @for (item of navigation; track item.label) {
+      <button class="nav-item" [class.active]="activePage === item.label" (click)="selectPage(item.label)"
+        [title]="item.label">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+        @if (item.label === 'AI Research') {
+        <span class="nav-badge">AI</span>
+        }
+      </button>
+      }
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="system-status">
+        <span class="status-dot"></span>
+        <span class="nav-label">Research engine ready</span>
+      </div>
+
+      <div class="profile">
+        <div class="avatar">FS</div>
+        <div class="profile-copy">
+          <strong>Research workspace</strong>
+          <small>Personal edition</small>
+        </div>
+        <span class="profile-menu">···</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-button menu-button" aria-label="Toggle sidebar" (click)="toggleSidebar()">☰</button>
+        <span class="breadcrumb">Workspace</span>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current">{{ activePage }}</span>
+      </div>
+
+      <div class="topbar-right">
+        <label class="search-box">
+          <span>⌕</span>
+          <input type="search" placeholder="Search your research..." aria-label="Search your research"
+            [value]="searchQuery" (input)="searchQuery = $any($event.target).value" />
+          <kbd>/</kbd>
+        </label>
+        <button class="icon-button notification-button" aria-label="Notifications">♧</button>
+        <div class="top-avatar">S</div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      @if (activePage === 'Overview') {
+      <section class="welcome-row">
+        <div>
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            YOUR RESEARCH WORKSPACE
+          </div>
+          <h1>Financial clarity starts here.</h1>
+          <p class="welcome-description">
+            Research companies, explore annual reports, and turn financial
+            data into actionable insights.
+          </p>
+        </div>
+
+        <button class="primary-button" (click)="selectPage('AI Research')">
+          <span>✳</span> Start AI research <span>↗</span>
+        </button>
+      </section>
+
+      <section class="stats-grid">
+        @for (stat of stats; track stat.label) {
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">{{ stat.label }}</span>
+            <span class="stat-icon" [class]="stat.color">
+              {{ stat.icon }}
+            </span>
+          </div>
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-detail">
+            <span class="detail-dot"></span>
+            {{ stat.detail }}
+          </div>
+        </article>
+        }
+      </section>
+
+      <section class="content-grid">
+        <article class="panel research-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Research workspace</h2>
+              <p>Your starting point for company analysis</p>
+            </div>
+            <span class="panel-menu">···</span>
+          </div>
+
+          <div class="featured-research">
+            <div class="featured-icon">✳</div>
+            <div class="featured-copy">
+              <span class="featured-tag">AI-POWERED RESEARCH</span>
+              <h3>Ask better financial questions</h3>
+              <p>
+                Explore company reports with document-grounded answers
+                and source attribution.
+              </p>
+              <button class="text-button" (click)="selectPage('AI Research')">
+                Open research assistant <span>→</span>
+              </button>
+            </div>
+            <div class="decorative-orbit orbit-one"></div>
+            <div class="decorative-orbit orbit-two"></div>
+          </div>
+
+          <div class="panel-footer">
+            <span class="footer-dot"></span>
+            RAG retrieval and multi-provider fallback configured
+          </div>
+        </article>
+
+        <article class="panel quick-actions-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Quick actions</h2>
+              <p>Continue building your research</p>
+            </div>
+          </div>
+
+          <button class="action-item" (click)="selectPage('Documents')">
+            <span class="action-icon document-icon">▧</span>
+            <span class="action-copy">
+              <strong>Explore documents</strong>
+              <small>Review indexed reports</small>
+            </span>
+            <span class="action-arrow">↗</span>
+          </button>
+
+          <button class="action-item" (click)="selectPage('Companies')">
+            <span class="action-icon company-icon">▤</span>
+            <span class="action-copy">
+              <strong>Company research</strong>
+              <small>Explore company information</small>
+            </span>
+            <span class="action-arrow">↗</span>
+          </button>
+
+          <button class="action-item" (click)="selectPage('Comparisons')">
+            <span class="action-icon compare-icon">⌁</span>
+            <span class="action-copy">
+              <strong>Compare performance</strong>
+              <small>Analyze metrics across years</small>
+            </span>
+            <span class="action-arrow">↗</span>
+          </button>
+        </article>
+      </section>
+
+      <section class="panel activity-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Recent research</h2>
+            <p>Your research activity will appear here</p>
+          </div>
+          <button class="secondary-button" (click)="selectPage('Documents')">
+            View documents <span>→</span>
+          </button>
+        </div>
+
+        <div class="empty-state">
+          <div class="empty-icon">▤</div>
+          <h3>Your research journey starts here</h3>
+          <p>
+            Upload a company annual report to begin asking questions
+            and exploring financial insights.
+          </p>
+          <button class="primary-button" (click)="selectPage('Documents')">
+            Explore documents <span>→</span>
+          </button>
+        </div>
+      </section>
+      } @else {
+      <section class="welcome-row">
+        <div>
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            FINSIGHT WORKSPACE
+          </div>
+          <h1>{{ activePage }}</h1>
+          <p class="welcome-description">
+            This workspace will be connected to your Spring Boot backend
+            as we implement each feature.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel placeholder-panel">
+        <div class="empty-icon">✳</div>
+        <h2>{{ activePage }} is coming next</h2>
+        <p>
+          The dashboard shell is ready. We'll implement this screen
+          as part of the document, research, and financial analysis milestones.
+        </p>
+        <button class="primary-button" (click)="selectPage('Overview')">
+          ← Back to overview
+        </button>
+      </section>
+      }
+
+      <footer class="page-footer">
+        <span>FinSight <span class="footer-separator">·</span> Financial Research Workspace</span>
+        <span>Built for research grounded in evidence</span>
+      </footer>
+    </div>
+  </main>
+</div>
