@@ -9,57 +9,50 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class PdfDocumentLoader {
-    public List<Document> load(String fileName) throws IOException {
-        ClassPathResource resource=new ClassPathResource("documents/"+fileName);
-        try(InputStream inputStream=resource.getInputStream()){
-            byte[] pdfBytes= inputStream.readAllBytes();
-            try (PDDocument pdfDocument= Loader.loadPDF(pdfBytes)){
-                PDFTextStripper stripper=new PDFTextStripper();
-                List<Document> documents=new ArrayList<>();
 
-                for(int page=1;page<=pdfDocument.getNumberOfPages();page++){
-                    stripper.setStartPage(page);
-                    stripper.setEndPage(page);
+    public List<Document> load(Path filePath,
+                               String company,
+                               String documentTitle,
+                               Integer year) throws IOException{
+        byte[] pdfBytes= Files.readAllBytes(filePath);
+        return parsePdf(pdfBytes,company,documentTitle,year);
+    }
 
-                    String text=stripper.getText(pdfDocument).trim();
-                    if(text.isBlank()){
-                        continue;
-                    }
-                    Document document=new Document(text);
-                    document.getMetadata().put(
-                            "company",
-                            "NVIDIA"
-                    );
+    private List<Document> parsePdf(
+            byte[] pdfBytes,
+            String company,
+            String documentTitle,
+            Integer year
+    ) throws  IOException{
+        try(PDDocument pdfDocument=Loader.loadPDF(pdfBytes)){
+            PDFTextStripper stripper=new PDFTextStripper();
+            List<Document> documents=new ArrayList<>();
 
-                    document.getMetadata().put(
-                            "document",
-                            "2026 Annual Report"
-                    );
+            for(int page=1;page<=pdfDocument.getNumberOfPages();page++){
+                stripper.setStartPage(page);
+                stripper.setEndPage(page);
 
-                    document.getMetadata().put(
-                            "year",
-                            2026
-                    );
-
-                    document.getMetadata().put(
-                            "page",
-                            page
-                    );
-
-                    documents.add(document);
+                String text=stripper.getText(pdfDocument).trim();
+                if(text.isBlank()){
+                    continue;
                 }
-                return documents;
-
-            } catch (IOException exception){
-                throw new IllegalStateException(
-                        "Failed to load PDF: "+fileName,exception
-                );
+                Document document=new Document(text);
+                document.getMetadata().put("company",company);
+                document.getMetadata().put("document",documentTitle);
+                document.getMetadata().put("page",page);
+                if(year!=null){
+                    document.getMetadata().put("year",year);
+                }
+                documents.add(document);
             }
+            return documents;
         }
     }
 }

@@ -2,16 +2,17 @@ spring:
   application:
     name: finsight-backend
 
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 27MB
+
   datasource:
     url: jdbc:postgresql://localhost:5432/finsight
     username: finsight
     password: finsight
 
   ai:
-    model:
-      embedding: ollama
-      chat: openai
-
     openai:
       base-url: https://openrouter.ai/api
       api-key: ${OPENROUTER_API_KEY}
@@ -19,18 +20,12 @@ spring:
         options:
           model: openrouter/free
 
-
-    mcp:
-      client:
-        streamable-http:
-          connections:
-            finsight-mcp:
-              url: http://localhost:8081
-
-    ollama:
-      base-url: http://localhost:11434
-      embedding:
-        model: nomic-embed-text
+    groq:
+      base-url: https://api.groq.com/openai/v1
+      api-key: ${GROQ_API_KEY}
+      chat:
+        options:
+          model: openai/gpt-oss-120b
 
     google:
       genai:
@@ -38,32 +33,30 @@ spring:
         chat:
           options:
             model: gemini-3.8-flash
+
+    ollama:
+      base-url: http://localhost:11434
+      embedding:
+        model: nomic-embed-text
+
+    mcp:
+      client:
+        streamable-http:
+          connections:
+            finsight-mcp:
+              url: http://localhost:8081
+              endpoint: /mcp
+
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+
     retry:
       max-attempts: 5
       backoff:
         initial-interval: 2000ms
         multiplier: 2.0
         max-interval: 10000ms
-
-    vectorstore:
-      pgvector:
-        initialize-schema: true
-
-openrouter:
-  api-key: ${OPENROUTER_API_KEY}
-  base-url: https://openrouter.ai/api/v1
-  model: openrouter/free
-
-groq:
-  api-key: ${GROQ_API_KEY}
-  base-url: https://api.groq.com/openai/v1
-  agent-base-url: https://api.groq.com/openai
-  model: openai/gpt-oss-120b
-
-voyage:
-  api-key: ${VOYAGE_API_KEY}
-  base-url: https://api.voyageai.com/v1
-  model: voyage-4-lite
 
 server:
   port: 8080

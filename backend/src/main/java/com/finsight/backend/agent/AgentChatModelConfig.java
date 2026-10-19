@@ -16,21 +16,20 @@ public class AgentChatModelConfig {
 
     @Bean
     public ChatModel groqAgentChatModel(
-            @Value("${groq.agent-base-url}") String baseUrl,
-            @Value("${groq.api-key}") String apiKey,
-            @Value("${groq.model}") String model
-    ){
-        OpenAiApi groqApi= OpenAiApi.builder()
+            @Value("${spring.ai.groq.base-url}") String baseUrl,
+            @Value("${spring.ai.groq.api-key}") String apiKey,
+            @Value("${spring.ai.groq.chat.options.model}") String model
+    ) {
+        OpenAiApi groqApi = OpenAiApi.builder()
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .build();
 
-        OpenAiChatOptions options= OpenAiChatOptions.builder()
+        OpenAiChatOptions options = OpenAiChatOptions.builder()
                 .model(model)
                 .build();
 
-        return OpenAiChatModel
-                .builder()
+        return OpenAiChatModel.builder()
                 .openAiApi(groqApi)
                 .defaultOptions(options)
                 .build();
@@ -39,14 +38,13 @@ public class AgentChatModelConfig {
     @Bean
     public ChatModel geminiAgentChatModel(
             @Value("${spring.ai.google.genai.api-key}") String apiKey,
-            @Value("${spring.ai.google.genai.chat.options.model:gemini-3.8-flash}")
-            String model
-    ){
-        Client genAiClient= Client.builder()
+            @Value("${spring.ai.google.genai.chat.options.model:gemini-3.8-flash}") String model
+    ) {
+        Client genAiClient = Client.builder()
                 .apiKey(apiKey)
                 .build();
 
-        GoogleGenAiChatOptions options= GoogleGenAiChatOptions.builder()
+        GoogleGenAiChatOptions options = GoogleGenAiChatOptions.builder()
                 .model(model)
                 .build();
 

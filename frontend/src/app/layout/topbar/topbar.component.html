@@ -1,0 +1,24 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="icon-button menu-button" aria-label="Toggle sidebar" (click)="toggleSidebar.emit()">☰</button>
+    <span class="breadcrumb">Workspace</span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">{{ activePage }}</span>
+  </div>
+
+  <div class="topbar-right">
+    <label class="search-box">
+      <span>⌕</span>
+      <input
+        type="search"
+        placeholder="Search your research..."
+        aria-label="Search your research"
+        [value]="searchQuery"
+        (input)="onSearch($event)"
+      />
+      <kbd>/</kbd>
+    </label>
+    <button class="icon-button notification-button" aria-label="Notifications">♧</button>
+    <div class="top-avatar">S</div>
+  </div>
+</header>
