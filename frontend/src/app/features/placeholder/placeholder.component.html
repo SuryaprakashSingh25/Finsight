@@ -1,0 +1,25 @@
+<section class="welcome-row">
+  <div>
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      FINSIGHT WORKSPACE
+    </div>
+    <h1>{{ activePage }}</h1>
+    <p class="welcome-description">
+      This workspace will be connected to your Spring Boot backend
+      as we implement each feature.
+    </p>
+  </div>
+</section>
+
+<section class="panel placeholder-panel">
+  <div class="empty-icon">✳</div>
+  <h2>{{ activePage }} is coming next</h2>
+  <p>
+    The dashboard shell is ready. We'll implement this screen
+    as part of the document, research, and financial analysis milestones.
+  </p>
+  <button class="primary-button" (click)="navigate.emit('Overview')">
+    ← Back to overview
+  </button>
+</section>

@@ -1,0 +1,106 @@
+<section class="welcome-row">
+  <div>
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      KNOWLEDGE LIBRARY
+    </div>
+    <h1>Financial documents</h1>
+    <p class="welcome-description">
+      Upload annual reports and index them for document-grounded AI research.
+    </p>
+  </div>
+</section>
+
+<section class="panel documents-panel">
+  <div class="panel-heading">
+    <div>
+      <h2>Upload a report</h2>
+      <p>PDF files up to 20 MB are supported.</p>
+    </div>
+    <span class="document-type-badge">PDF</span>
+  </div>
+
+  <div class="upload-form">
+    <label class="form-field">
+      <span>Company name *</span>
+      <input
+        type="text"
+        placeholder="e.g. NVIDIA"
+        [value]="company"
+        (input)="company = $any($event.target).value"
+        [disabled]="uploading"
+      />
+    </label>
+
+    <label class="form-field">
+      <span>Document title *</span>
+      <input
+        type="text"
+        placeholder="e.g. 2026 Annual Report"
+        [value]="documentTitle"
+        (input)="documentTitle = $any($event.target).value"
+        [disabled]="uploading"
+      />
+    </label>
+
+    <label class="form-field">
+      <span>Report year</span>
+      <input
+        type="number"
+        placeholder="e.g. 2026"
+        min="1900"
+        max="2100"
+        [value]="year"
+        (input)="year = $any($event.target).value"
+        [disabled]="uploading"
+      />
+    </label>
+
+    <label class="file-picker">
+      <span class="file-picker-icon">↥</span>
+      <strong>
+        {{ selectedFile ? selectedFile.name : 'Choose a PDF report' }}
+      </strong>
+      <small>
+        {{ selectedFile ? 'File selected' : 'Select a file from your computer' }}
+      </small>
+      <input
+        type="file"
+        accept=".pdf,application/pdf"
+        (change)="onFileSelected($event)"
+        [disabled]="uploading"
+      />
+    </label>
+
+    @if (uploadError) {
+      <div class="upload-message error-message" role="alert">
+        {{ uploadError }}
+      </div>
+    }
+
+    @if (uploadResult) {
+      <div class="upload-message success-message" role="status">
+        <strong>Report indexed successfully</strong>
+        <p>
+          {{ uploadResult.documentTitle }} —
+          {{ uploadResult.chunksIndexed }} chunks indexed.
+        </p>
+      </div>
+    }
+
+    <button
+      class="primary-button upload-submit"
+      (click)="uploadDocument()"
+      [disabled]="uploading"
+    >
+      {{ uploading ? 'Uploading and indexing…' : 'Upload and index report' }}
+      @if (!uploading) {
+        <span>→</span>
+      }
+    </button>
+
+    <p class="upload-note">
+      Indexing can take a little time while the report is processed and embedded.
+    </p>
+  </div>
+</section>

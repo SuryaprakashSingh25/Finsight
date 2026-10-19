@@ -1,0 +1,63 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #192536;
+}
+
+.app-shell {
+  --sidebar-width: 252px;
+  min-height: 100vh;
+
+  &.sidebar-collapsed {
+    --sidebar-width: 76px;
+  }
+}
+
+.main-content {
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+  background: #f5f7fa;
+  transition: margin-left 180ms ease;
+}
+
+.page-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 36px 38px 20px;
+}
+
+.page-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 2px 6px;
+  color: #9aa5b2;
+  font-size: 9px;
+}
+
+.footer-separator {
+  padding: 0 4px;
+  color: #c0c8d1;
+}
+
+@media (max-width: 1100px) {
+  .page-content {
+    padding-right: 25px;
+    padding-left: 25px;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    --sidebar-width: 0px;
+  }
+
+  .page-content {
+    padding: 26px 15px 18px;
+  }
+
+  .page-footer {
+    flex-direction: column;
+    line-height: 1.6;
+  }
+}

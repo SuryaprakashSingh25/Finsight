@@ -1,6 +1,5 @@
 package com.finsight.backend.service;
 
-import com.finsight.backend.ai.AIProvider;
 import com.finsight.backend.ai.AIResponse;
 import com.finsight.backend.ai.ModelRouter;
 import org.springframework.stereotype.Service;

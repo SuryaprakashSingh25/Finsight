@@ -1,0 +1,252 @@
+:host {
+  display: block;
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  padding: 27px 17px 16px;
+  color: #c5d0df;
+  background: #101b2a;
+  border-right: 1px solid #233044;
+  transition: width 180ms ease;
+  box-sizing: border-box;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 34px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  place-items: center;
+  border-radius: 12px;
+  color: #0b2929;
+  background: #72dfc5;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.brand-copy,
+.profile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.brand-copy strong {
+  font-size: 20px;
+  letter-spacing: -0.6px;
+}
+
+.brand-copy small {
+  color: #8292a8;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+}
+
+.workspace-label {
+  padding: 0 11px 11px;
+  color: #71829a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.navigation {
+  display: grid;
+  gap: 5px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 45px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #aebdd0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.nav-item:hover {
+  color: #fff;
+  background: #1a2a3e;
+}
+
+.nav-item.active {
+  color: #e9fff9;
+  background: #1c3440;
+  border-color: #2b4a52;
+}
+
+.nav-item.active .nav-icon {
+  color: #72dfc5;
+}
+
+.nav-icon {
+  display: grid;
+  width: 21px;
+  place-items: center;
+  font-size: 19px;
+}
+
+.nav-badge {
+  margin-left: auto;
+  padding: 3px 6px;
+  border-radius: 5px;
+  color: #8ce9d5;
+  background: #263d47;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+}
+
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 9px;
+  color: #9bacc0;
+  font-size: 10px;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #51c9a8;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 5px 0;
+  border-top: 1px solid #2a3547;
+}
+
+.avatar {
+  display: grid;
+  flex: 0 0 auto;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border-radius: 10px;
+  color: #d6e5ff;
+  background: #33465f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.profile-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-copy strong {
+  overflow: hidden;
+  color: #e1e8f1;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-copy small {
+  color: #8292a8;
+  font-size: 10px;
+}
+
+.profile-menu {
+  color: #8b9ab0;
+  font-size: 20px;
+}
+
+:host-context(.sidebar-collapsed) {
+  .sidebar {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+  .brand {
+    justify-content: center;
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .brand-copy,
+  .workspace-label,
+  .nav-label,
+  .nav-badge,
+  .profile-copy,
+  .profile-menu {
+    display: none;
+  }
+  .nav-item {
+    justify-content: center;
+    padding: 0;
+  }
+  .system-status,
+  .profile {
+    justify-content: center;
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    width: 252px;
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
+  }
+
+  :host-context(.sidebar-collapsed) .sidebar {
+    width: 252px;
+    transform: translateX(0);
+  }
+
+  :host-context(.sidebar-collapsed) {
+    .brand {
+      justify-content: flex-start;
+    }
+    .brand-copy,
+    .workspace-label,
+    .nav-label,
+    .nav-badge,
+    .profile-copy,
+    .profile-menu {
+      display: initial;
+    }
+    .nav-item {
+      justify-content: flex-start;
+      padding: 0 12px;
+    }
+    .system-status,
+    .profile {
+      justify-content: flex-start;
+      padding-right: 9px;
+      padding-left: 9px;
+    }
+  }
+}

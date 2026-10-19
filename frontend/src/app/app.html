@@ -1,0 +1,37 @@
+<div class="app-shell" [class.sidebar-collapsed]="sidebarCollapsed">
+  <app-sidebar
+    [activePage]="activePage"
+    (pageSelect)="selectPage($event)"
+  />
+
+  <main class="main-content">
+    <app-topbar
+      [activePage]="activePage"
+      [searchQuery]="searchQuery"
+      (toggleSidebar)="toggleSidebar()"
+      (searchQueryChange)="updateSearch($event)"
+    />
+
+    <div class="page-content">
+      @switch (activePage) {
+        @case ('Overview') {
+          <app-overview (navigate)="selectPage($event)" />
+        }
+        @case ('Documents') {
+          <app-documents />
+        }
+        @default {
+          <app-placeholder
+            [activePage]="activePage"
+            (navigate)="selectPage($event)"
+          />
+        }
+      }
+
+      <footer class="page-footer">
+        <span>FinSight <span class="footer-separator">·</span> Financial Research Workspace</span>
+        <span>Built for research grounded in evidence</span>
+      </footer>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,44 @@
+<aside class="sidebar">
+  <a class="brand" href="#" (click)="$event.preventDefault(); select('Overview')">
+    <span class="brand-mark">F</span>
+    <span class="brand-copy">
+      <strong>FinSight</strong>
+      <small>FINANCIAL INTELLIGENCE</small>
+    </span>
+  </a>
+
+  <div class="workspace-label">WORKSPACE</div>
+
+  <nav class="navigation">
+    @for (item of navigation; track item.label) {
+      <button
+        class="nav-item"
+        [class.active]="activePage === item.label"
+        (click)="select(item.label)"
+        [title]="item.label"
+      >
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+        @if (item.badge) {
+          <span class="nav-badge">{{ item.badge }}</span>
+        }
+      </button>
+    }
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="system-status">
+      <span class="status-dot"></span>
+      <span class="nav-label">Research engine ready</span>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">FS</div>
+      <div class="profile-copy">
+        <strong>Research workspace</strong>
+        <small>Personal edition</small>
+      </div>
+      <span class="profile-menu">···</span>
+    </div>
+  </div>
+</aside>

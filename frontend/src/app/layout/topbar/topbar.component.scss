@@ -1,0 +1,139 @@
+:host {
+  display: block;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72px;
+  padding: 0 38px;
+  border-bottom: 1px solid #e8edf2;
+  background: rgb(255 255 255 / 94%);
+  backdrop-filter: blur(12px);
+}
+
+.topbar-left,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.breadcrumb {
+  color: #7d8b9c;
+  font-size: 12px;
+}
+
+.breadcrumb-separator {
+  color: #c4ccd6;
+}
+
+.breadcrumb-current {
+  color: #253247;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.icon-button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #e6ebf1;
+  border-radius: 9px;
+  color: #58687b;
+  background: #fff;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.icon-button:hover {
+  background: #f4f7fa;
+}
+
+.menu-button {
+  display: none;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 245px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e4eaf0;
+  border-radius: 9px;
+  background: #f9fafc;
+  color: #7b8b9f;
+}
+
+.search-box > span {
+  font-size: 22px;
+}
+
+.search-box input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #243348;
+  font: inherit;
+  font-size: 11px;
+}
+
+.search-box kbd {
+  padding: 2px 5px;
+  border: 1px solid #e1e7ee;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 10px;
+}
+
+.top-avatar {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  color: #216d61;
+  background: #c8f0e5;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .topbar {
+    padding-right: 25px;
+    padding-left: 25px;
+  }
+}
+
+@media (max-width: 760px) {
+  .menu-button {
+    display: grid;
+  }
+
+  .topbar {
+    min-height: 62px;
+    padding: 0 15px;
+  }
+
+  .topbar-right {
+    gap: 7px;
+  }
+
+  .search-box {
+    width: clamp(100px, 34vw, 190px);
+  }
+
+  .notification-button {
+    display: none;
+  }
+}
