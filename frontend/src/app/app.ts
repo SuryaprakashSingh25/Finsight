@@ -4,6 +4,8 @@ import { TopbarComponent } from './layout/topbar/topbar.component';
 import { OverviewComponent } from './features/overview/overview.component';
 import { DocumentsComponent } from './features/documents/documents.component';
 import { PlaceholderComponent } from './features/placeholder/placeholder.component';
+import { ResearchComponent } from './features/research/research.component';
+import { CompaniesComponent } from './features/companies/companies.component';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +15,9 @@ import { PlaceholderComponent } from './features/placeholder/placeholder.compone
     TopbarComponent,
     OverviewComponent,
     DocumentsComponent,
-    PlaceholderComponent
+    PlaceholderComponent,
+    ResearchComponent,
+    CompaniesComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'

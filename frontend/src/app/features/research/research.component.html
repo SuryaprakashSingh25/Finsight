@@ -1,0 +1,67 @@
+<section class="welcome-row">
+  <div>
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      AGENTIC RESEARCH CONSOLE
+    </div>
+    <h1>AI Research Assistant</h1>
+    <p class="welcome-description">
+      Grounded in indexed financial reports. Tool-augmented via MCP for precise metric calculations.
+    </p>
+  </div>
+</section>
+
+<section class="research-container">
+  <div class="chat-thread">
+    @for (msg of messages(); track msg.id) {
+      <div class="message-wrapper" [class.user]="msg.sender === 'user'" [class.assistant]="msg.sender === 'assistant'">
+        <div class="message-meta">
+          <span class="sender-name">{{ msg.sender === 'user' ? 'You' : 'FinSight Agent' }}</span>
+          @if (msg.provider && !msg.loading) {
+            <span class="provider-pill" [class]="msg.provider">{{ msg.provider }}</span>
+          }
+        </div>
+
+        <div class="message-bubble">
+          @if (msg.loading) {
+            <div class="loading-state">
+              <span class="spinner"></span>
+              <span>Analyzing context & consulting MCP tools...</span>
+            </div>
+          } @else {
+            <div class="message-content">{{ msg.text }}</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (messages().length <= 2) {
+    <div class="quick-prompts">
+      <span>Suggested questions:</span>
+      <div class="prompt-chips">
+        @for (q of quickQueries; track q) {
+          <button class="chip" (click)="setQuery(q)">{{ q }}</button>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="input-panel">
+    <textarea
+      rows="2"
+      placeholder="Ask about revenue growth, operating margins, or document disclosures..."
+      [ngModel]="userInput()"
+      (ngModelChange)="userInput.set($event)"
+      (keydown.enter)="$event.preventDefault(); sendQuestion()"
+      [disabled]="isThinking()"
+    ></textarea>
+    <button class="primary-button send-btn" (click)="sendQuestion()" [disabled]="isThinking() || !userInput().trim()">
+      @if (isThinking()) {
+        <span>...</span>
+      } @else {
+        <span>Ask Agent ↗</span>
+      }
+    </button>
+  </div>
+</section>

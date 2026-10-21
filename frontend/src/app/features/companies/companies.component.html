@@ -1,0 +1,75 @@
+<section class="welcome-row">
+  <div>
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      PORTFOLIO & COVERAGE
+    </div>
+    <h1>Tracked Companies</h1>
+    <p class="welcome-description">
+      Review companies with indexed financial statements, annual filings, and research chunk allocations.
+    </p>
+  </div>
+
+  <button class="primary-button" (click)="navigate.emit('Documents')">
+    <span>+</span> Index New Report
+  </button>
+</section>
+
+@if (loading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <span>Loading indexed companies...</span>
+  </div>
+} @else if (errorMessage()) {
+  <div class="error-banner">
+    {{ errorMessage() }}
+  </div>
+} @else if (companies().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">▤</div>
+    <h3>No companies tracked yet</h3>
+    <p>Upload a company annual report or 10-K filing to index its fundamentals and begin analysis.</p>
+    <button class="primary-button" (click)="navigate.emit('Documents')">Upload Document ↗</button>
+  </div>
+} @else {
+  <div class="companies-grid">
+    @for (comp of companies(); track comp.company) {
+      <article class="company-card">
+        <div class="card-header">
+          <div class="company-badge">{{ comp.company.substring(0, 2).toUpperCase() }}</div>
+          <div class="header-titles">
+            <h2>{{ comp.company }}</h2>
+            <span>{{ comp.totalReports }} {{ comp.totalReports === 1 ? 'Report' : 'Reports' }} Indexed</span>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-pill">
+            <span class="stat-num">{{ comp.totalChunks }}</span>
+            <span class="stat-lbl">Vector Chunks</span>
+          </div>
+          <button class="action-btn" (click)="navigate.emit('AI Research')">
+            Research ↗
+          </button>
+        </div>
+
+        <div class="reports-section">
+          <span class="section-label">AVAILABLE DOCUMENTS</span>
+          <ul class="doc-list">
+            @for (doc of comp.reports; track doc.documentTitle) {
+              <li class="doc-item">
+                <span class="doc-title">{{ doc.documentTitle }}</span>
+                <span class="doc-meta">
+                  @if (doc.year) {
+                    <span class="year-badge">{{ doc.year }}</span>
+                  }
+                  <small>{{ doc.chunkCount }} chunks</small>
+                </span>
+              </li>
+            }
+          </ul>
+        </div>
+      </article>
+    }
+  </div>
+}

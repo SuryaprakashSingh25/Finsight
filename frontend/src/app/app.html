@@ -17,8 +17,14 @@
         @case ('Overview') {
           <app-overview (navigate)="selectPage($event)" />
         }
+        @case ('Companies') {
+          <app-companies (navigate)="selectPage($event)" />
+        }
         @case ('Documents') {
           <app-documents />
+        }
+        @case ('AI Research') {
+          <app-research />
         }
         @default {
           <app-placeholder
