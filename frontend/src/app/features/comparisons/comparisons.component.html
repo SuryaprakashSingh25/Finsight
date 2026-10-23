@@ -1,0 +1,122 @@
+<section class="welcome-row">
+  <div>
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      CROSS-ENTITY BENCHMARKING
+    </div>
+    <h1>Financial Comparisons</h1>
+    <p class="welcome-description">
+      Run agentic head-to-head analysis across companies or fiscal years with automated MCP metric synthesis.
+    </p>
+  </div>
+</section>
+
+@if (loadingCompanies()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <span>Loading indexed reports...</span>
+  </div>
+} @else if (companies().length === 0) {
+  <div class="empty-state">
+    <h3>No documents indexed</h3>
+    <p>Please index at least one annual report in Documents to unlock comparative analytics.</p>
+  </div>
+} @else {
+  <div class="comparison-grid">
+    <!-- Target A -->
+    <div class="selector-card">
+      <div class="target-badge">ENTITY A</div>
+      <label class="form-field">
+        <span>Company</span>
+        <select [ngModel]="companyA()" (ngModelChange)="companyA.set($event)">
+          @for (c of companies(); track c.company) {
+            <option [value]="c.company">{{ c.company }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="form-field">
+        <span>Fiscal Year</span>
+        <select [ngModel]="yearA()" (ngModelChange)="yearA.set($event)">
+          @for (y of getYearsFor(companyA()); track y) {
+            <option [value]="y">{{ y }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="vs-divider">VS</div>
+
+    <!-- Target B -->
+    <div class="selector-card">
+      <div class="target-badge secondary">ENTITY B</div>
+      <label class="form-field">
+        <span>Company</span>
+        <select [ngModel]="companyB()" (ngModelChange)="companyB.set($event)">
+          @for (c of companies(); track c.company) {
+            <option [value]="c.company">{{ c.company }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="form-field">
+        <span>Fiscal Year</span>
+        <select [ngModel]="yearB()" (ngModelChange)="yearB.set($event)">
+          @for (y of getYearsFor(companyB()); track y) {
+            <option [value]="y">{{ y }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="control-panel">
+    <label class="form-field metric-field">
+      <span>Focus Metrics & Analysis Scope</span>
+      <input
+        type="text"
+        [ngModel]="metricFocus()"
+        (ngModelChange)="metricFocus.set($event)"
+        placeholder="e.g. Operating margins, revenue growth, R&D intensity"
+        [disabled]="comparing()"
+      />
+    </label>
+
+    <button
+      class="primary-button compare-btn"
+      (click)="executeComparison()"
+      [disabled]="comparing() || !companyA() || !companyB()"
+    >
+      {{ comparing() ? 'Agent Analyzing & Calculating…' : 'Generate Comparative Analysis ↗' }}
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  @if (analysisResult()) {
+    <article class="results-panel" id="printable-report">
+      <div class="results-header">
+        <div>
+          <h2>Comparative Intelligence Report</h2>
+          <div class="meta-row">
+            <span class="provider-tag">Executed by: {{ analysisProvider() }}</span>
+            <span class="report-targets">{{ companyA() }} ({{ yearA() ?? 'Latest' }}) vs {{ companyB() }} ({{ yearB() ?? 'Latest' }})</span>
+          </div>
+        </div>
+
+        <button class="secondary-button export-btn no-print" (click)="exportPdf()" title="Print / Save as PDF">
+          <span class="icon">⎙</span>
+          <span>Export PDF</span>
+        </button>
+      </div>
+
+      <div class="analysis-body markdown-content" [innerHTML]="analysisResult() | markdown"></div>
+      <footer class="print-only-footer">
+    <span>FinSight Financial Intelligence Platform — Confidential Research</span>
+    <span>Generated: {{ today | date:'mediumDate' }}</span>
+  </footer>
+    </article>
+  }
+}

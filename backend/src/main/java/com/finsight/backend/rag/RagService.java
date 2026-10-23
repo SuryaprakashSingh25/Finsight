@@ -3,7 +3,9 @@ package com.finsight.backend.rag;
 import com.finsight.backend.ai.AIResponse;
 import com.finsight.backend.ai.ModelRouter;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -111,5 +113,34 @@ public class RagService {
                 context,
                 sources
         );
+    }
+
+    public RagContext retrieveForCompany(String question, String company, Integer year){
+        FilterExpressionBuilder b=new FilterExpressionBuilder();
+        var filterExpression=year!=null?b.and(b.eq("company",company), b.eq("year",year)).build(): b.eq("company",company).build();
+
+        SearchRequest request= SearchRequest.builder()
+                .query(question)
+                .topK(4)
+                .filterExpression(filterExpression)
+                .build();
+
+        List<Document> documents=vectorStore.similaritySearch(request);
+        if(documents==null || documents.isEmpty()){
+            return new RagContext("", List.of());
+        }
+
+        String context=documents.stream()
+                .map(Document::getText)
+                .collect(Collectors.joining("\n\n---\n\n"));
+
+        List<SourceReference> sources=documents.stream()
+                .map(document -> new SourceReference(
+                        (String) document.getMetadata().get("document"),
+                        getIntegerMetadata(document,"page"),
+                        getIntegerMetadata(document,"chunk_index")
+                )).toList();
+
+        return new RagContext(context,sources);
     }
 }

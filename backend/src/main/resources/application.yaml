@@ -45,7 +45,6 @@ spring:
           connections:
             finsight-mcp:
               url: http://localhost:8081
-              endpoint: /mcp
 
     vectorstore:
       pgvector:
