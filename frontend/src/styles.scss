@@ -39,3 +39,23 @@ input:focus-visible {
   color: #12342e;
   background: #b7f1e2;
 }
+
+
+
+@media print {
+  app-sidebar,
+  app-topbar,
+  .page-footer {
+    display: none !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    background: #fff !important;
+  }
+
+  .page-content {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+}

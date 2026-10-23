@@ -6,6 +6,7 @@ import { DocumentsComponent } from './features/documents/documents.component';
 import { PlaceholderComponent } from './features/placeholder/placeholder.component';
 import { ResearchComponent } from './features/research/research.component';
 import { CompaniesComponent } from './features/companies/companies.component';
+import { ComparisonsComponent } from './features/comparisons/comparisons.component';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,8 @@ import { CompaniesComponent } from './features/companies/companies.component';
     DocumentsComponent,
     PlaceholderComponent,
     ResearchComponent,
-    CompaniesComponent
+    CompaniesComponent,
+    ComparisonsComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
