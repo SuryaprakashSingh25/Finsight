@@ -1,4 +1,4 @@
-<section class="welcome-row">
+<section class="welcome-row no-print">
   <div>
     <div class="eyebrow">
       <span class="eyebrow-dot"></span>
@@ -12,17 +12,17 @@
 </section>
 
 @if (loadingCompanies()) {
-  <div class="loading-state">
+  <div class="loading-state no-print">
     <div class="spinner"></div>
     <span>Loading indexed reports...</span>
   </div>
 } @else if (companies().length === 0) {
-  <div class="empty-state">
+  <div class="empty-state no-print">
     <h3>No documents indexed</h3>
     <p>Please index at least one annual report in Documents to unlock comparative analytics.</p>
   </div>
 } @else {
-  <div class="comparison-grid">
+  <div class="comparison-grid no-print">
     <!-- Target A -->
     <div class="selector-card">
       <div class="target-badge">ENTITY A</div>
@@ -70,7 +70,7 @@
     </div>
   </div>
 
-  <div class="control-panel">
+  <div class="control-panel no-print">
     <label class="form-field metric-field">
       <span>Focus Metrics & Analysis Scope</span>
       <input
@@ -92,12 +92,45 @@
   </div>
 
   @if (errorMessage()) {
-    <div class="error-banner">{{ errorMessage() }}</div>
+    <div class="error-banner no-print">{{ errorMessage() }}</div>
   }
 
   @if (analysisResult()) {
     <article class="results-panel" id="printable-report">
-      <div class="results-header">
+      <!-- Institutional PDF Cover Header (Visible only when printed/exported) -->
+      <header class="print-header">
+        <div class="print-brand-row">
+          <div class="print-brand">
+            <span class="print-brand-mark">F</span>
+            <div class="print-brand-text">
+              <strong>FinSight Intelligence</strong>
+              <small>AGENTIC FINANCIAL RESEARCH & VALUATION ENGINE</small>
+            </div>
+          </div>
+          <div class="print-badge">CONFIDENTIAL // RESEARCH MEMORANDUM</div>
+        </div>
+
+        <div class="print-divider"></div>
+
+        <div class="print-meta-grid">
+          <div class="print-meta-col">
+            <span class="meta-label">BENCHMARK COMPARISON</span>
+            <div class="meta-entities">
+              <span class="entity-pill">{{ companyA() }} ({{ yearA() ?? 'Latest' }})</span>
+              <span class="entity-vs">vs</span>
+              <span class="entity-pill">{{ companyB() }} ({{ yearB() ?? 'Latest' }})</span>
+            </div>
+          </div>
+          <div class="print-meta-col right">
+            <span class="meta-label">REPORT METADATA</span>
+            <span class="meta-val">Date: {{ today | date:'mediumDate' }}</span>
+            <span class="meta-val">Verified via: Model Context Protocol (MCP)</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Standard Screen View Header -->
+      <div class="results-header no-print">
         <div>
           <h2>Comparative Intelligence Report</h2>
           <div class="meta-row">
@@ -106,17 +139,24 @@
           </div>
         </div>
 
-        <button class="secondary-button export-btn no-print" (click)="exportPdf()" title="Print / Save as PDF">
+        <button class="secondary-button export-btn" (click)="exportPdf()" title="Print / Save as PDF">
           <span class="icon">⎙</span>
           <span>Export PDF</span>
         </button>
       </div>
 
+      <!-- Main Rendered Markdown Content -->
       <div class="analysis-body markdown-content" [innerHTML]="analysisResult() | markdown"></div>
+
+      <!-- Formal Running Print Footer -->
       <footer class="print-only-footer">
-    <span>FinSight Financial Intelligence Platform — Confidential Research</span>
-    <span>Generated: {{ today | date:'mediumDate' }}</span>
-  </footer>
+        <div class="footer-left">
+          <span>FinSight Financial Intelligence Platform &bull; Evidence Grounded &bull; Deterministic Math</span>
+        </div>
+        <div class="footer-right">
+          <span>Confidential Equity Memorandum &bull; {{ today | date:'yyyy-MM-dd' }}</span>
+        </div>
+      </footer>
     </article>
   }
 }
