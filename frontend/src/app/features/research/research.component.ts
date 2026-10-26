@@ -2,11 +2,12 @@ import { Component, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ResearchService } from "../../core/services/research.service";
 import { ChatMessage } from "../../core/models/research.model";
+import { MarkdownPipe } from "../../core/pipes/markdown.pipe";
 
 @Component({
     selector: 'app-research',
     standalone: true,
-    imports: [FormsModule],
+    imports: [FormsModule, MarkdownPipe],
     templateUrl: './research.component.html',
     styleUrl: './research.component.scss'
 })

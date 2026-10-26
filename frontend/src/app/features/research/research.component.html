@@ -29,7 +29,7 @@
               <span>Analyzing context & consulting MCP tools...</span>
             </div>
           } @else {
-            <div class="message-content">{{ msg.text }}</div>
+            <div class="message-content markdown-body" [innerHTML]="msg.text | markdown"></div>
           }
         </div>
       </div>

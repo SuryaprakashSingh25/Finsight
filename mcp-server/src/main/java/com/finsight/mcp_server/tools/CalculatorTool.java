@@ -12,7 +12,7 @@ public class CalculatorTool {
 
     @McpTool(
             name = "percentageGrowth",
-            description = "Calculate the percentage growth from a previous value to a current value"
+            description = "Calculate percentage change from previous to current value. Formula: ((current - previous) / previous) * 100"
     )
     public double percentageGrowth(double current, double previous) {
         log.info("MCP TOOL: percentageGrowth(current={}, previous={})", current, previous);
@@ -23,38 +23,47 @@ public class CalculatorTool {
     }
 
     @McpTool(
-            name = "operatingMargin",
-            description = "Calculate the operating profit margin percentage given operating income and revenue"
+            name = "profitMargin",
+            description = "Calculate profit margin percentage. Formula: (income / totalRevenue) * 100"
     )
-    public double operatingMargin(double operatingIncome, double totalRevenue) {
-        log.info("MCP TOOL: operatingMargin(operatingIncome={}, totalRevenue={})", operatingIncome, totalRevenue);
+    public double profitMargin(double income, double totalRevenue) {
+        log.info("MCP TOOL: profitMargin(income={}, revenue={})", income, totalRevenue);
         if (totalRevenue == 0) {
             throw new IllegalArgumentException("Total revenue cannot be zero");
         }
-        return (operatingIncome / totalRevenue) * 100.0;
+        return (income / totalRevenue) * 100.0;
     }
 
     @McpTool(
             name = "cagr",
-            description = "Calculate Compound Annual Growth Rate (CAGR) as a percentage over a given number of periods/years"
+            description = "Calculate Compound Annual Growth Rate (CAGR) percentage across periods. Formula: ((ending / beginning) ^ (1 / periods) - 1) * 100"
     )
     public double cagr(double beginningValue, double endingValue, double periods) {
         log.info("MCP TOOL: cagr(beg={}, end={}, periods={})", beginningValue, endingValue, periods);
         if (beginningValue <= 0 || endingValue <= 0 || periods <= 0) {
-            throw new IllegalArgumentException("Values and periods must be positive and non-zero");
+            throw new IllegalArgumentException("Values and periods must be positive non-zero numbers");
         }
         return (Math.pow(endingValue / beginningValue, 1.0 / periods) - 1.0) * 100.0;
     }
 
     @McpTool(
             name = "debtToEquity",
-            description = "Calculate the Debt-to-Equity (D/E) ratio"
+            description = "Calculate Debt-to-Equity ratio. Formula: totalLiabilities / totalStockholdersEquity"
     )
-    public double debtToEquity(double totalDebt, double totalEquity) {
-        log.info("MCP TOOL: debtToEquity(totalDebt={}, totalEquity={})", totalDebt, totalEquity);
-        if (totalEquity == 0) {
-            throw new IllegalArgumentException("Total equity cannot be zero");
+    public double debtToEquity(double totalLiabilities, double totalStockholdersEquity) {
+        log.info("MCP TOOL: debtToEquity(debt={}, equity={})", totalLiabilities, totalStockholdersEquity);
+        if (totalStockholdersEquity == 0) {
+            throw new IllegalArgumentException("Shareholder equity cannot be zero");
         }
-        return totalDebt / totalEquity;
+        return totalLiabilities / totalStockholdersEquity;
+    }
+
+    @McpTool(
+            name = "freeCashFlow",
+            description = "Calculate Free Cash Flow. Formula: operatingCashFlow - capitalExpenditures"
+    )
+    public double freeCashFlow(double operatingCashFlow, double capitalExpenditures) {
+        log.info("MCP TOOL: freeCashFlow(ocf={}, capex={})", operatingCashFlow, capitalExpenditures);
+        return operatingCashFlow - capitalExpenditures;
     }
 }
