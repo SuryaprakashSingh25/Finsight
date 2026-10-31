@@ -1,4 +1,4 @@
-<section class="welcome-row">
+<section class="welcome-row no-print">
   <div>
     <div class="eyebrow">
       <span class="eyebrow-dot"></span>
@@ -16,23 +16,23 @@
 </section>
 
 @if (loading()) {
-  <div class="loading-container">
+  <div class="loading-container no-print">
     <div class="spinner"></div>
     <span>Loading indexed companies...</span>
   </div>
 } @else if (errorMessage()) {
-  <div class="error-banner">
+  <div class="error-banner no-print">
     {{ errorMessage() }}
   </div>
 } @else if (companies().length === 0) {
-  <div class="empty-state">
+  <div class="empty-state no-print">
     <div class="empty-icon">▤</div>
     <h3>No companies tracked yet</h3>
     <p>Upload a company annual report or 10-K filing to index its fundamentals and begin analysis.</p>
     <button class="primary-button" (click)="navigate.emit('Documents')">Upload Document ↗</button>
   </div>
 } @else {
-  <div class="companies-grid">
+  <div class="companies-grid no-print">
     @for (comp of companies(); track comp.company) {
       <article class="company-card">
         <div class="card-header">
@@ -41,6 +41,27 @@
             <h2>{{ comp.company }}</h2>
             <span>{{ comp.totalReports }} {{ comp.totalReports === 1 ? 'Report' : 'Reports' }} Indexed</span>
           </div>
+
+          <!-- Delete Action Icon Button -->
+          <button
+            class="delete-btn"
+            (click)="deleteCompany(comp.company, $event)"
+            [disabled]="deletingCompany() === comp.company"
+            title="Delete company and indexed chunks"
+            aria-label="Delete company"
+          >
+            @if (deletingCompany() === comp.company) {
+              <span class="delete-spinner"></span>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                <line x1="10" y1="11" x2="10" y2="17"/>
+                <line x1="14" y1="11" x2="14" y2="17"/>
+              </svg>
+            }
+          </button>
         </div>
 
         <div class="stats-row">
@@ -48,9 +69,14 @@
             <span class="stat-num">{{ comp.totalChunks }}</span>
             <span class="stat-lbl">Vector Chunks</span>
           </div>
-          <button class="action-btn" (click)="navigate.emit('AI Research')">
-            Research ↗
-          </button>
+          <div class="button-group">
+            <button class="tearsheet-btn" (click)="generateTearSheet(comp.company, comp.reports[0]?.year)" title="Generate 1-Page Tear Sheet">
+              ⚡ Tear Sheet
+            </button>
+            <button class="action-btn" (click)="navigate.emit('AI Research')">
+              Research ↗
+            </button>
+          </div>
         </div>
 
         <div class="reports-section">
@@ -71,5 +97,62 @@
         </div>
       </article>
     }
+  </div>
+}
+
+<!-- Tear Sheet Modal Drawer -->
+@if (isGeneratingTearSheet() || activeTearSheet()) {
+  <div class="modal-backdrop no-print" (click)="closeTearSheet()"></div>
+  <div class="tearsheet-modal" id="printable-tearsheet">
+    <div class="modal-topbar no-print">
+      <div class="modal-title">
+        <span class="badge">AGENTIC TEAR SHEET</span>
+        <h2>{{ activeCompany() }} ({{ activeYear() ?? 'FY' }})</h2>
+      </div>
+      <div class="modal-actions">
+        @if (activeTearSheet() && !isGeneratingTearSheet()) {
+          <button class="secondary-button" (click)="printTearSheet()">
+            <span>⎙</span> Export PDF
+          </button>
+        }
+        <button class="close-btn" (click)="closeTearSheet()">✕</button>
+      </div>
+    </div>
+
+    <!-- Print-only Institutional Header -->
+    <header class="print-header">
+      <div class="print-brand-row">
+        <div class="print-brand">
+          <span class="print-brand-mark">F</span>
+          <div class="print-brand-text">
+            <strong>FinSight Intelligence</strong>
+            <small>CONFIDENTIAL EXECUTIVE TEAR SHEET</small>
+          </div>
+        </div>
+        <div class="print-badge">VALUATION & SOLVENCY MEMORANDUM</div>
+      </div>
+      <div class="print-divider"></div>
+      <div class="print-meta-grid">
+        <div><strong>Entity:</strong> {{ activeCompany() }} ({{ activeYear() ?? 'FY' }})</div>
+        <div><strong>Date:</strong> {{ today | date:'mediumDate' }}</div>
+      </div>
+    </header>
+
+    <div class="modal-body">
+      @if (isGeneratingTearSheet()) {
+        <div class="modal-loading">
+          <div class="spinner"></div>
+          <h3>Synthesizing Executive Tear Sheet...</h3>
+          <p>Extracting 10-K disclosures, executing DuPont & Altman Z-Score tools, and pulling real-time market data.</p>
+        </div>
+      } @else if (activeTearSheet()) {
+        <div class="analysis-body markdown-content" [innerHTML]="activeTearSheet() | markdown"></div>
+      }
+    </div>
+
+    <footer class="print-only-footer">
+      <span>FinSight Financial Intelligence &bull; Verified Fundamental Math</span>
+      <span>Confidential &bull; {{ today | date:'yyyy-MM-dd' }}</span>
+    </footer>
   </div>
 }

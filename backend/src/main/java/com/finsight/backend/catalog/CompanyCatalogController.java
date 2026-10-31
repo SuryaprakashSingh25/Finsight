@@ -1,8 +1,7 @@
 package com.finsight.backend.catalog;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,5 +18,11 @@ public class CompanyCatalogController {
     @GetMapping
     public List<CompanySummaryDTO> getCompanies() {
         return catalogService.getTrackedCompanies();
+    }
+
+    @DeleteMapping("/{company}")
+    public ResponseEntity<Void> deleteCompany(@PathVariable String company) {
+        catalogService.deleteCompany(company);
+        return ResponseEntity.noContent().build();
     }
 }

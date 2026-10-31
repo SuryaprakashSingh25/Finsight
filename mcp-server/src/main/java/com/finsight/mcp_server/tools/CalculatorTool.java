@@ -66,4 +66,52 @@ public class CalculatorTool {
         log.info("MCP TOOL: freeCashFlow(ocf={}, capex={})", operatingCashFlow, capitalExpenditures);
         return operatingCashFlow - capitalExpenditures;
     }
+
+    @McpTool(
+            name = "altmanZScore",
+            description = "Calculate the Altman Z-Score for bankruptcy risk assessment for manufacturing/public firms. " +
+                    "Formula: 1.2*(workingCapital/totalAssets) + 1.4*(retainedEarnings/totalAssets) + 3.3*(ebit/totalAssets) + 0.6*(marketValueOfEquity/totalLiabilities) + 0.999*(sales/totalAssets). " +
+                    "Z > 2.99 = Safe Zone, 1.81 <= Z <= 2.99 = Grey Zone, Z < 1.81 = Distress Zone."
+    )
+    public double altmanZScore(double workingCapital, double retainedEarnings, double ebit, double marketValueOfEquity, double sales, double totalAssets, double totalLiabilities
+    ) {
+        log.info("MCP TOOL: altmanZScore invoked for assets={}, liabilities={}", totalAssets, totalLiabilities);
+        if (totalAssets <= 0 || totalLiabilities <= 0) {
+            throw new IllegalArgumentException("Total Assets and Total Liabilities must be strictly positive non-zero values.");
+        }
+
+        double x1 = workingCapital / totalAssets;
+        double x2 = retainedEarnings / totalAssets;
+        double x3 = ebit / totalAssets;
+        double x4 = marketValueOfEquity / totalLiabilities;
+        double x5 = sales / totalAssets;
+
+        return (1.2 * x1) + (1.4 * x2) + (3.3 * x3) + (0.6 * x4) + (0.999 * x5);
+    }
+
+    @McpTool(
+            name = "dupontAnalysis",
+            description = "Perform a DuPont 3-Step ROE Decomposition to determine whether returns stem from margins, asset efficiency, or leverage. " +
+                    "Returns a structured breakdown: Profit Margin (netIncome/revenue), Asset Turnover (revenue/totalAssets), Equity Multiplier (totalAssets/shareholdersEquity), and resulting ROE."
+    )
+    public String dupontAnalysis(double netIncome, double revenue, double totalAssets, double shareholdersEquity
+    ) {
+        log.info("MCP TOOL: dupontAnalysis for revenue={}, equity={}", revenue, shareholdersEquity);
+        if (revenue <= 0 || totalAssets <= 0 || shareholdersEquity <= 0) {
+            throw new IllegalArgumentException("Revenue, Total Assets, and Equity must be strictly positive non-zero values.");
+        }
+
+        double profitMargin = (netIncome / revenue) * 100.0;
+        double assetTurnover = revenue / totalAssets;
+        double equityMultiplier = totalAssets / shareholdersEquity;
+        double roe = (profitMargin / 100.0) * assetTurnover * equityMultiplier * 100.0;
+
+        return """
+                DuPont 3-Step ROE Breakdown:
+                - Net Profit Margin: %.2f%% (Operating efficiency)
+                - Asset Turnover: %.2fx (Asset utilization)
+                - Equity Multiplier (Leverage): %.2fx (Financial leverage)
+                - Calculated ROE: %.2f%%
+                """.formatted(profitMargin, assetTurnover, equityMultiplier, roe);
+    }
 }

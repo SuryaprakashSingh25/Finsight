@@ -12,4 +12,8 @@ export class CompanyService {
   getCompanies(): Observable<CompanySummary[]> {
     return this.http.get<CompanySummary[]>('/api/companies');
   }
+
+  deleteCompany(company: string): Observable<void> {
+    return this.http.delete<void>(`/api/companies/${encodeURIComponent(company)}`);
+  }
 }
