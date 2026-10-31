@@ -64,4 +64,15 @@ public class CompanyCatalogService {
 
         return summaries;
     }
+
+    public int deleteCompany(String company) {
+        String sql = """
+            DELETE FROM vector_store
+            WHERE metadata->>'company' = :company
+        """;
+
+        return jdbcClient.sql(sql)
+                .param("company", company)
+                .update();
+    }
 }
