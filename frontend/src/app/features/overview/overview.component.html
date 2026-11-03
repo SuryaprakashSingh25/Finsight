@@ -17,21 +17,50 @@
 </section>
 
 <section class="stats-grid">
-  @for (stat of stats; track stat.label) {
-    <article class="stat-card">
-      <div class="stat-top">
-        <span class="stat-label">{{ stat.label }}</span>
-        <span class="stat-icon" [class]="stat.color">
-          {{ stat.icon }}
-        </span>
-      </div>
-      <div class="stat-value">{{ stat.value }}</div>
-      <div class="stat-detail">
-        <span class="detail-dot"></span>
-        {{ stat.detail }}
-      </div>
-    </article>
-  }
+  <!-- Companies Tracked -->
+  <article class="stat-card">
+    <div class="stat-top">
+      <span class="stat-label">Companies tracked</span>
+      <span class="stat-icon teal">▤</span>
+    </div>
+    <div class="stat-value">
+      {{ loading() ? '...' : formatCount(stats()?.companiesTracked) }}
+    </div>
+    <div class="stat-detail">
+      <span class="detail-dot"></span>
+      Distinct corporate entities in PgVector
+    </div>
+  </article>
+
+  <!-- Reports Indexed -->
+  <article class="stat-card">
+    <div class="stat-top">
+      <span class="stat-label">Reports indexed</span>
+      <span class="stat-icon blue">▧</span>
+    </div>
+    <div class="stat-value">
+      {{ loading() ? '...' : formatCount(stats()?.reportsIndexed) }}
+    </div>
+    <div class="stat-detail">
+      <span class="detail-dot"></span>
+      {{ stats()?.totalChunksIndexed ?? 0 }} vector chunks available
+    </div>
+  </article>
+
+  <!-- AI Providers -->
+  <article class="stat-card">
+    <div class="stat-top">
+      <span class="stat-label">AI providers</span>
+      <span class="stat-icon purple">✳</span>
+    </div>
+    <div class="stat-value">
+      {{ loading() ? '...' : formatCount(stats()?.activeAiProviders) }}
+    </div>
+    <div class="stat-detail">
+      <span class="detail-dot"></span>
+      Gemini, Groq, OpenRouter failover
+    </div>
+  </article>
 </section>
 
 <section class="content-grid">
@@ -41,7 +70,6 @@
         <h2>Research workspace</h2>
         <p>Your starting point for company analysis</p>
       </div>
-      <span class="panel-menu">···</span>
     </div>
 
     <div class="featured-research">
@@ -63,7 +91,7 @@
 
     <div class="panel-footer">
       <span class="footer-dot"></span>
-      RAG retrieval and multi-provider fallback configured
+      RAG retrieval and Streamable MCP tools (Port 8081) active
     </div>
   </article>
 
@@ -78,8 +106,8 @@
     <button class="action-item" (click)="navigate.emit('Documents')">
       <span class="action-icon document-icon">▧</span>
       <span class="action-copy">
-        <strong>Explore documents</strong>
-        <small>Review indexed reports</small>
+        <strong>Upload & Index Report</strong>
+        <small>Ingest PDF into PostgreSQL pgvector</small>
       </span>
       <span class="action-arrow">↗</span>
     </button>
@@ -87,8 +115,8 @@
     <button class="action-item" (click)="navigate.emit('Companies')">
       <span class="action-icon company-icon">▤</span>
       <span class="action-copy">
-        <strong>Company research</strong>
-        <small>Explore company information</small>
+        <strong>Company Catalog & Tear Sheets</strong>
+        <small>1-Click Altman Z-Score & DuPont analysis</small>
       </span>
       <span class="action-arrow">↗</span>
     </button>
@@ -97,7 +125,7 @@
       <span class="action-icon compare-icon">⌁</span>
       <span class="action-copy">
         <strong>Compare performance</strong>
-        <small>Analyze metrics across years</small>
+        <small>Analyze metrics across years & firms</small>
       </span>
       <span class="action-arrow">↗</span>
     </button>
@@ -107,23 +135,43 @@
 <section class="panel activity-panel">
   <div class="panel-heading">
     <div>
-      <h2>Recent research</h2>
-      <p>Your research activity will appear here</p>
+      <h2>Recent research & indexed reports</h2>
+      <p>Documents active in your local vector memory</p>
     </div>
-    <button class="secondary-button" (click)="navigate.emit('Documents')">
-      View documents <span>→</span>
+    <button class="secondary-button" (click)="navigate.emit('Companies')">
+      View all companies <span>→</span>
     </button>
   </div>
 
-  <div class="empty-state">
-    <div class="empty-icon">▤</div>
-    <h3>Your research journey starts here</h3>
-    <p>
-      Upload a company annual report to begin asking questions
-      and exploring financial insights.
-    </p>
-    <button class="primary-button" (click)="navigate.emit('Documents')">
-      Explore documents <span>→</span>
-    </button>
-  </div>
+  @if (stats()?.recentActivity?.length) {
+    <div class="activity-list">
+      @for (item of stats()!.recentActivity; track item.documentTitle) {
+        <div class="activity-row" (click)="navigate.emit('Companies')">
+          <div class="activity-main">
+            <span class="activity-badge">{{ item.company.substring(0, 2).toUpperCase() }}</span>
+            <div>
+              <strong>{{ item.company }}</strong>
+              <small>{{ item.documentTitle }} @if (item.year) { ({{ item.year }}) }</small>
+            </div>
+          </div>
+          <div class="activity-meta">
+            <span class="chunk-badge">{{ item.chunks }} chunks</span>
+            <span class="arrow">↗</span>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <div class="empty-icon">▤</div>
+      <h3>Your research journey starts here</h3>
+      <p>
+        Upload a company annual report to begin asking questions
+        and exploring financial insights.
+      </p>
+      <button class="primary-button" (click)="navigate.emit('Documents')">
+        Upload report <span>→</span>
+      </button>
+    </div>
+  }
 </section>

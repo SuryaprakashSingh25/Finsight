@@ -71,21 +71,21 @@ h1 {
 .primary-button {
   color: #0d302b;
   background: #72dfc5;
-}
 
-.primary-button:hover {
-  background: #5dd3b6;
-  transform: translateY(-1px);
+  &:hover {
+    background: #5dd3b6;
+    transform: translateY(-1px);
+  }
 }
 
 .secondary-button {
   color: #526378;
   background: #fff;
   border-color: #e3e9ef;
-}
 
-.secondary-button:hover {
-  background: #f5f8fa;
+  &:hover {
+    background: #f5f8fa;
+  }
 }
 
 .stats-grid {
@@ -128,21 +128,21 @@ h1 {
   place-items: center;
   border-radius: 9px;
   font-size: 17px;
-}
 
-.stat-icon.teal {
-  color: #218f7a;
-  background: #e5f8f2;
-}
+  &.teal {
+    color: #218f7a;
+    background: #e5f8f2;
+  }
 
-.stat-icon.blue {
-  color: #447bc4;
-  background: #eaf2ff;
-}
+  &.blue {
+    color: #447bc4;
+    background: #eaf2ff;
+  }
 
-.stat-icon.purple {
-  color: #8662c1;
-  background: #f2ebff;
+  &.purple {
+    color: #8662c1;
+    background: #f2ebff;
+  }
 }
 
 .stat-value {
@@ -194,12 +194,6 @@ h1 {
     font-size: 10px;
     line-height: 1.6;
   }
-}
-
-.panel-menu {
-  color: #8b98a7;
-  font-size: 21px;
-  line-height: 1;
 }
 
 .featured-research {
@@ -385,6 +379,79 @@ h1 {
   .panel-heading {
     align-items: center;
     margin-bottom: 0;
+  }
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.activity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 9px;
+  border: 1px solid #edf2f7;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  &:hover {
+    background: #edf8f5;
+    border-color: #c7ede3;
+  }
+}
+
+.activity-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  strong {
+    display: block;
+    font-size: 13px;
+    color: #1e293b;
+  }
+
+  small {
+    color: #64748b;
+    font-size: 11px;
+  }
+}
+
+.activity-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #1e3a47;
+  color: #72dfc5;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.activity-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .chunk-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+    background: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .arrow {
+    color: #94a3b8;
+    font-size: 14px;
   }
 }
 

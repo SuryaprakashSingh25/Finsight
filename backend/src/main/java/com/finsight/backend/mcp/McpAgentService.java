@@ -7,6 +7,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -16,6 +17,17 @@ public class McpAgentService {
     private static final Logger log= LoggerFactory.getLogger(McpAgentService.class);
 
     private final List<AgentProvider> providers;
+
+    private static final String SYSTEM_PROMPT = """
+            You are FinSight, an elite financial research assistant and investment analyst.
+
+            Guidelines:
+            1. Context Priority: Use provided document context for historical GAAP figures.
+            2. Strict Math via Tools: NEVER calculate yourself. Invoke MCP tools ('profitMargin', 'cagr', 'debtToEquity', 'dupontAnalysis', 'altmanZScore').
+            3. Real-Time News & Live Quotes: Invoke 'getRecentCompanyNews' and 'getLiveMarketQuote'.
+            4. Tool Efficiency: Issue all required tool calls together in parallel in your first turn.
+            5. Output: Professional Markdown without scratchpad or LaTeX delimiters ($$ or \\\\( \\\\)).
+            """;
 
     public McpAgentService(
             @Qualifier("openAiChatModel") ChatModel openRouterModel,
@@ -41,6 +53,9 @@ public class McpAgentService {
         return new AgentProvider(name,client);
     }
 
+    /**
+     * Non-streaming call (kept for TearSheet and Comparison workflows)
+     */
     public AgentResult ask(String question) {
         RuntimeException lastException=null;
 
@@ -49,22 +64,7 @@ public class McpAgentService {
                 log.info("Attemting agent request with provider={}",provider.name());
                 String response=provider.chatClient()
                         .prompt()
-                        .system("""
-                                     You are FinSight, an elite financial research assistant and investment analyst.
-
-                                    Guidelines:
-                                    1. Context Priority: Use the provided document context to extract historical GAAP figures (Revenue, Operating Margin, Net Income, CapEx).
-                                    2. Strict Math via Tools: NEVER perform arithmetic calculations yourself. You MUST invoke the appropriate MCP calculator tool:
-                                       - percentageGrowth for periodic increases/decreases.
-                                       - profitMargin for operating or gross margin ratios.
-                                       - cagr for multi-year growth trends.
-                                       - debtToEquity for leverage assessment.
-                                       - freeCashFlow for cash generation.
-                                    3. Real-Time News & Market Context: When the user asks about recent stock performance, management sentiment, headwinds, or current events, invoke the 'getRecentCompanyNews' tool.
-                                    4. Synthesize: Blend historical 10-K report facts with current news context. If information is missing from both the document and tools, state the limitation clearly.
-                                    5. Tone: Objective, quantitative, and concise. Format output using clean Markdown headers, bullet points, and tables.
-                                    6. Do NOT output raw LaTeX math delimiters like $$ or \\( \\). Write financial figures and formulas as clean standard text (e.g., "$15.2B", "Revenue growth = 22.4%").
-                                    """)
+                        .system(SYSTEM_PROMPT)
                         .user(question)
                         .call()
                         .content();
@@ -83,6 +83,42 @@ public class McpAgentService {
             }
         }
         throw new IllegalStateException("All agent providers failed", lastException);
+    }
 
+    /**
+     * Streaming call returning token-by-token events with fallback
+     */
+    public Flux<StreamEvent> streamAsk(String question) {
+        return Flux.defer(() -> streamWithProviderIndex(question, 0));
+    }
+
+    private Flux<StreamEvent> streamWithProviderIndex(String question, int providerIndex) {
+        if (providerIndex >= providers.size()) {
+            return Flux.just(StreamEvent.error("All AI research providers failed to generate a response."));
+        }
+
+        AgentProvider provider = providers.get(providerIndex);
+        log.info("Attempting agent STREAM request with provider={}", provider.name());
+
+        Flux<StreamEvent> statusEvent = Flux.just(
+                StreamEvent.status("Consulting " + provider.name().toUpperCase() + " with MCP tools...")
+        );
+
+        Flux<StreamEvent> tokenStream = provider.chatClient()
+                .prompt()
+                .system(SYSTEM_PROMPT)
+                .user(question)
+                .stream()
+                .content()
+                .filter(chunk -> chunk != null && !chunk.isEmpty())
+                .map(StreamEvent::token)
+                .concatWith(Flux.just(StreamEvent.complete(provider.name())))
+                .onErrorResume(ex -> {
+                    log.warn("Streaming failed on provider={}: {}. Falling back to next provider...",
+                            provider.name(), ex.getMessage());
+                    return streamWithProviderIndex(question, providerIndex + 1);
+                });
+
+        return Flux.concat(statusEvent, tokenStream);
     }
 }

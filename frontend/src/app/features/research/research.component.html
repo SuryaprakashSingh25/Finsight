@@ -23,13 +23,16 @@
         </div>
 
         <div class="message-bubble">
-          @if (msg.loading) {
+          @if (msg.loading && !msg.text) {
             <div class="loading-state">
               <span class="spinner"></span>
-              <span>Analyzing context & consulting MCP tools...</span>
+              <span>{{ msg.statusText || 'Analyzing context & consulting MCP tools...' }}</span>
             </div>
           } @else {
             <div class="message-content markdown-body" [innerHTML]="msg.text | markdown"></div>
+            @if (isThinking() && msg.loading) {
+              <span class="cursor-blink">▌</span>
+            }
           }
         </div>
       </div>

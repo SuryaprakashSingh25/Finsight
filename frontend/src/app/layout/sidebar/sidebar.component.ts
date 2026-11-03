@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, signal } from '@angular/core';
 import { NavItem } from '../../core/models/navigation.model';
 
 @Component({
@@ -11,6 +11,8 @@ export class SidebarComponent {
   @Input() activePage = 'Overview';
   @Output() pageSelect = new EventEmitter<string>();
 
+  isMenuOpen = signal(false);
+
   readonly navigation: NavItem[] = [
     { label: 'Overview', icon: '◫' },
     { label: 'Companies', icon: '▤' },
@@ -21,5 +23,31 @@ export class SidebarComponent {
 
   select(page: string): void {
     this.pageSelect.emit(page);
+    this.isMenuOpen.set(false);
+  }
+
+  toggleWorkspaceMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.isMenuOpen.update((open) => !open);
+  }
+
+  refreshWorkspace(): void {
+    window.location.reload();
+  }
+
+  toggleFullScreen(): void {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+    this.isMenuOpen.set(false);
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.isMenuOpen()) {
+      this.isMenuOpen.set(false);
+    }
   }
 }
