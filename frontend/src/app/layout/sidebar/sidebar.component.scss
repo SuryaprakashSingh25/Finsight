@@ -85,21 +85,21 @@
   font: inherit;
   font-size: 13px;
   transition: background 150ms ease, color 150ms ease;
-}
 
-.nav-item:hover {
-  color: #fff;
-  background: #1a2a3e;
-}
+  &:hover {
+    color: #fff;
+    background: #1a2a3e;
+  }
 
-.nav-item.active {
-  color: #e9fff9;
-  background: #1c3440;
-  border-color: #2b4a52;
-}
+  &.active {
+    color: #e9fff9;
+    background: #1c3440;
+    border-color: #2b4a52;
 
-.nav-item.active .nav-icon {
-  color: #72dfc5;
+    .nav-icon {
+      color: #72dfc5;
+    }
+  }
 }
 
 .nav-icon {
@@ -141,6 +141,7 @@
 }
 
 .profile {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -164,24 +165,115 @@
 .profile-copy {
   min-width: 0;
   flex: 1;
+
+  strong {
+    overflow: hidden;
+    color: #e1e8f1;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    color: #8292a8;
+    font-size: 10px;
+  }
 }
 
-.profile-copy strong {
-  overflow: hidden;
-  color: #e1e8f1;
-  font-size: 11px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.profile-action-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #7b8ea5;
+  cursor: pointer;
+  padding: 0;
+  transition: all 150ms ease;
+
+  &:hover,
+  &.active {
+    color: #fff;
+    background: #1e2c3e;
+    border-color: #2f435c;
+  }
 }
 
-.profile-copy small {
-  color: #8292a8;
-  font-size: 10px;
+/* ==========================================================================
+   FLOATING WORKSPACE POPUP MENU
+   ========================================================================== */
+.workspace-popup-menu {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  width: 224px;
+  background: #172436;
+  border: 1px solid #283a4f;
+  border-radius: 11px;
+  padding: 8px 0;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  animation: popupFade 140ms ease-out;
+
+  .menu-label {
+    font-size: 8.5px;
+    font-weight: 750;
+    color: #64748b;
+    padding: 4px 14px 6px;
+    letter-spacing: 0.8px;
+  }
+
+  .popup-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    color: #cbd5e1;
+    font: inherit;
+    font-size: 11px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease;
+
+    .popup-icon {
+      font-size: 13px;
+      color: #72dfc5;
+    }
+
+    &:hover {
+      background: #203348;
+      color: #fff;
+    }
+  }
+
+  .popup-divider {
+    height: 1px;
+    background: #25364b;
+    margin: 6px 0;
+  }
+
+  .version-tag {
+    padding: 3px 14px 2px;
+    font-size: 9px;
+    color: #64748b;
+    letter-spacing: 0.3px;
+  }
 }
 
-.profile-menu {
-  color: #8b9ab0;
-  font-size: 20px;
+@keyframes popupFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 :host-context(.sidebar-collapsed) {
@@ -199,7 +291,8 @@
   .nav-label,
   .nav-badge,
   .profile-copy,
-  .profile-menu {
+  .profile-action-btn,
+  .workspace-popup-menu {
     display: none;
   }
   .nav-item {
@@ -235,7 +328,7 @@
     .nav-label,
     .nav-badge,
     .profile-copy,
-    .profile-menu {
+    .profile-action-btn {
       display: initial;
     }
     .nav-item {

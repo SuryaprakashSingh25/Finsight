@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { StatItem } from '../../core/models/navigation.model';
+import { Component, EventEmitter, inject, OnInit, Output, signal } from '@angular/core';
+import { OverviewService } from '../../core/services/overview.service';
+import { OverviewStats } from '../../core/models/overview.model';
 
 @Component({
   selector: 'app-overview',
@@ -7,30 +8,29 @@ import { StatItem } from '../../core/models/navigation.model';
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss'
 })
-export class OverviewComponent {
+export class OverviewComponent implements OnInit {
+  private readonly overviewService = inject(OverviewService);
+
   @Output() navigate = new EventEmitter<string>();
 
-  readonly stats: StatItem[] = [
-    {
-      label: 'Companies tracked',
-      value: '01',
-      detail: 'Your research workspace',
-      icon: '▤',
-      color: 'teal'
-    },
-    {
-      label: 'Reports indexed',
-      value: '01',
-      detail: 'Annual report available',
-      icon: '▧',
-      color: 'blue'
-    },
-    {
-      label: 'AI providers',
-      value: '03',
-      detail: 'Automatic fallback enabled',
-      icon: '✳',
-      color: 'purple'
-    }
-  ];
+  stats = signal<OverviewStats | null>(null);
+  loading = signal(true);
+
+  ngOnInit(): void {
+    this.overviewService.getStats().subscribe({
+      next: (data) => {
+        this.stats.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load overview stats', err);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  formatCount(val: number | undefined): string {
+    if (val === undefined || val === null) return '00';
+    return val < 10 ? `0${val}` : `${val}`;
+  }
 }

@@ -38,7 +38,38 @@
         <strong>Research workspace</strong>
         <small>Personal edition</small>
       </div>
-      <span class="profile-menu">···</span>
+
+      <!-- Functional options trigger -->
+      <button
+        class="profile-action-btn"
+        [class.active]="isMenuOpen()"
+        title="Workspace options"
+        aria-label="Workspace options"
+        (click)="toggleWorkspaceMenu($event)"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="1"></circle>
+          <circle cx="19" cy="12" r="1"></circle>
+          <circle cx="5" cy="12" r="1"></circle>
+        </svg>
+      </button>
+
+      <!-- Floating Workspace Popup Menu -->
+      @if (isMenuOpen()) {
+        <div class="workspace-popup-menu" (click)="$event.stopPropagation()">
+          <div class="menu-label">WORKSPACE CONTROLS</div>
+          <button class="popup-item" (click)="refreshWorkspace()">
+            <span class="popup-icon">↻</span>
+            <span>Refresh Memory & Cache</span>
+          </button>
+          <button class="popup-item" (click)="toggleFullScreen()">
+            <span class="popup-icon">⛶</span>
+            <span>Toggle Fullscreen</span>
+          </button>
+          <div class="popup-divider"></div>
+          <div class="version-tag">FinSight Engine &bull; Port 8081 Active</div>
+        </div>
+      }
     </div>
   </div>
 </aside>
