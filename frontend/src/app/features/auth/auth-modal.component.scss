@@ -1,0 +1,93 @@
+.auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 20, 32, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 32px 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      .brand-mark {
+        width: 32px;
+        height: 32px;
+        background: #72dfc5;
+        color: #0b2929;
+        font-weight: 800;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+      }
+      strong { display: block; font-size: 15px; color: #1e293b; }
+      small { font-size: 9px; color: #64748b; letter-spacing: 0.8px; }
+    }
+    h2 { font-size: 19px; color: #0f172a; margin: 0 0 6px; }
+    .subtitle { font-size: 12px; color: #64748b; margin: 0 0 20px; }
+    .error-banner {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        span { font-size: 11px; font-weight: 600; color: #334155; }
+        input {
+          height: 38px;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          padding: 0 12px;
+          font-size: 13px;
+          outline: none;
+          &:focus { border-color: #218f7a; box-shadow: 0 0 0 2px rgba(33, 143, 122, 0.15); }
+        }
+      }
+    }
+    .primary-button {
+      height: 42px;
+      background: #72dfc5;
+      color: #0d302b;
+      font-weight: 650;
+      border: 0;
+      border-radius: 8px;
+      margin-top: 6px;
+      cursor: pointer;
+      &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+    .toggle-mode {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #64748b;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      .link-btn {
+        background: transparent;
+        border: 0;
+        color: #218f7a;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    }

@@ -33,13 +33,12 @@
     </div>
 
     <div class="profile">
-      <div class="avatar">FS</div>
+      <div class="avatar">{{ userInitials }}</div>
       <div class="profile-copy">
-        <strong>Research workspace</strong>
-        <small>Personal edition</small>
+        <strong>{{ authService.currentUser()?.fullName || 'Research workspace' }}</strong>
+        <small>{{ authService.currentUser()?.email || 'Personal edition' }}</small>
       </div>
 
-      <!-- Functional options trigger -->
       <button
         class="profile-action-btn"
         [class.active]="isMenuOpen()"
@@ -54,7 +53,6 @@
         </svg>
       </button>
 
-      <!-- Floating Workspace Popup Menu -->
       @if (isMenuOpen()) {
         <div class="workspace-popup-menu" (click)="$event.stopPropagation()">
           <div class="menu-label">WORKSPACE CONTROLS</div>
@@ -67,7 +65,10 @@
             <span>Toggle Fullscreen</span>
           </button>
           <div class="popup-divider"></div>
-          <div class="version-tag">FinSight Engine &bull; Port 8081 Active</div>
+          <button class="popup-item text-danger" (click)="logout()">
+            <span class="popup-icon">⎋</span>
+            <span>Sign Out</span>
+          </button>
         </div>
       }
     </div>

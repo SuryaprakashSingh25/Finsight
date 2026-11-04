@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { TopbarComponent } from './layout/topbar/topbar.component';
 import { OverviewComponent } from './features/overview/overview.component';
@@ -7,6 +7,8 @@ import { PlaceholderComponent } from './features/placeholder/placeholder.compone
 import { ResearchComponent } from './features/research/research.component';
 import { CompaniesComponent } from './features/companies/companies.component';
 import { ComparisonsComponent } from './features/comparisons/comparisons.component';
+import { AuthModalComponent } from './features/auth/auth-modal.component';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -19,12 +21,14 @@ import { ComparisonsComponent } from './features/comparisons/comparisons.compone
     PlaceholderComponent,
     ResearchComponent,
     CompaniesComponent,
-    ComparisonsComponent
+    ComparisonsComponent,
+    AuthModalComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
+  readonly authService = inject(AuthService);
   sidebarCollapsed = false;
   activePage = 'Overview';
   searchQuery = '';
