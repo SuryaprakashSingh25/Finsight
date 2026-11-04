@@ -59,6 +59,8 @@
     </div>
 
     <!-- User Profile Avatar -->
-    <div class="top-avatar" title="Active Analyst Session">S</div>
+    <div class="top-avatar" [title]="authService.currentUser()?.email || 'Active Analyst Session'">
+    {{ userInitial }}
+  </div>
   </div>
 </header>

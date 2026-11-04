@@ -19,8 +19,14 @@ export class ResearchService {
       const controller = new AbortController();
       const encodedQuestion = encodeURIComponent(question);
       const url = `/api/agent/stream?question=${encodedQuestion}`;
+      const token = localStorage.getItem('finsight_jwt_token');
 
-      fetch(url, { signal: controller.signal })
+      fetch(url, {
+        signal: controller.signal,
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      })
         .then(async (response) => {
           if (!response.ok || !response.body) {
             throw new Error(`SSE request failed with status: ${response.status}`);
@@ -46,7 +52,6 @@ export class ResearchService {
                   const eventPayload: StreamEventPayload = JSON.parse(jsonStr);
                   subscriber.next(eventPayload);
                 } catch {
-                  // Ignore partial chunk parse glitches
                 }
               }
             }

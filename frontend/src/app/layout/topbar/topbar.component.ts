@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { CompanyService } from '../../core/services/company.service';
 import { CompanySummary } from '../../core/models/company.model';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-topbar',
@@ -21,6 +22,7 @@ import { CompanySummary } from '../../core/models/company.model';
 })
 export class TopbarComponent implements OnInit {
   private readonly companyService = inject(CompanyService);
+  readonly authService = inject(AuthService);
 
   @Input() activePage = 'Overview';
   @Input() searchQuery = '';
@@ -83,5 +85,10 @@ export class TopbarComponent implements OnInit {
   selectCompanyFromSearch(company: string): void {
     this.clearSearch();
     this.navigate.emit('Companies');
+  }
+
+  get userInitial(): string {
+    const name = this.authService.currentUser()?.fullName;
+    return name ? name.trim().charAt(0).toUpperCase() : 'S';
   }
 }

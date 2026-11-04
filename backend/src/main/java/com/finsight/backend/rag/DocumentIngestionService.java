@@ -1,5 +1,6 @@
 package com.finsight.backend.rag;
 
+import com.finsight.backend.auth.SecurityUtils;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
@@ -16,40 +17,47 @@ public class DocumentIngestionService {
     private final PdfDocumentLoader pdfDocumentLoader;
     private final DocumentChunker documentChunker;
     private final VectorStore vectorStore;
+    private final SecurityUtils securityUtils;
 
     public DocumentIngestionService(
             PdfDocumentLoader pdfDocumentLoader,
             DocumentChunker documentChunker,
-            VectorStore vectorStore
+            VectorStore vectorStore,
+            SecurityUtils securityUtils
     ) {
         this.pdfDocumentLoader = pdfDocumentLoader;
         this.documentChunker = documentChunker;
         this.vectorStore = vectorStore;
+        this.securityUtils = securityUtils;
     }
 
-    public int ingest(Path filePath, String company, String documentTitle, Integer year) throws IOException{
-        List<Document> pages=pdfDocumentLoader.load(filePath,company,documentTitle,year);
+    public int ingest(Path filePath, String company, String documentTitle, Integer year) throws IOException {
+        List<Document> pages = pdfDocumentLoader.load(filePath, company, documentTitle, year);
         return ingestPages(pages);
     }
 
-    private int ingestPages(List<Document> pages){
-        if(pages.isEmpty()){
+    private int ingestPages(List<Document> pages) {
+        if (pages.isEmpty()) {
             throw new IllegalArgumentException("The PDF contains no extractable text.");
         }
 
-        List<Document> chunks=documentChunker.chunk(pages);
+        List<Document> chunks = documentChunker.chunk(pages);
 
-        if(chunks.isEmpty()){
+        if (chunks.isEmpty()) {
             throw new IllegalArgumentException("No text chunks could be created from the PDF.");
         }
 
-        for(int i=0;i<chunks.size();i++){
-            chunks.get(i).getMetadata().put("chunk_index",i);
+        String userId = securityUtils.getCurrentUserIdString();
+
+        for (int i = 0; i < chunks.size(); i++) {
+            Document chunk = chunks.get(i);
+            chunk.getMetadata().put("chunk_index", i);
+            chunk.getMetadata().put("uploaded_by", userId);
         }
 
-        for(int start=0;start<chunks.size();start+=BATCH_SIZE){
-            int end=Math.min(start+BATCH_SIZE,chunks.size());
-            List<Document> batch=chunks.subList(start,end);
+        for (int start = 0; start < chunks.size(); start += BATCH_SIZE) {
+            int end = Math.min(start + BATCH_SIZE, chunks.size());
+            List<Document> batch = chunks.subList(start, end);
             vectorStore.add(batch);
         }
         return chunks.size();

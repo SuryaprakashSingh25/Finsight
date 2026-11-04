@@ -1,5 +1,6 @@
-import { Component, EventEmitter, HostListener, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, HostListener, inject, Input, Output, signal } from '@angular/core';
 import { NavItem } from '../../core/models/navigation.model';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -8,6 +9,8 @@ import { NavItem } from '../../core/models/navigation.model';
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
+  readonly authService = inject(AuthService);
+
   @Input() activePage = 'Overview';
   @Output() pageSelect = new EventEmitter<string>();
 
@@ -20,6 +23,15 @@ export class SidebarComponent {
     { label: 'AI Research', icon: '✳', badge: 'AI' },
     { label: 'Comparisons', icon: '⌁' }
   ];
+
+  get userInitials(): string {
+    const name = this.authService.currentUser()?.fullName?.trim();
+    if (!name) return 'FS';
+    const parts = name.split(/\s+/);
+    return parts.length > 1
+      ? (parts[0][0] + parts[1][0]).toUpperCase()
+      : parts[0].substring(0, 2).toUpperCase();
+  }
 
   select(page: string): void {
     this.pageSelect.emit(page);
@@ -41,6 +53,11 @@ export class SidebarComponent {
     } else {
       document.exitFullscreen().catch(() => {});
     }
+    this.isMenuOpen.set(false);
+  }
+
+  logout(): void {
+    this.authService.logout();
     this.isMenuOpen.set(false);
   }
 

@@ -1,3 +1,7 @@
+@if (!authService.isAuthenticated()) {
+  <app-auth-modal (authenticated)="selectPage('Overview')" />
+}
+
 <div class="app-shell" [class.sidebar-collapsed]="sidebarCollapsed">
   <app-sidebar
     [activePage]="activePage"

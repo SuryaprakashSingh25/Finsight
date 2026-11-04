@@ -1,0 +1,51 @@
+<div class="auth-overlay">
+      <div class="auth-card">
+        <div class="brand-row">
+          <span class="brand-mark">F</span>
+          <div>
+            <strong>FinSight</strong>
+            <small>INSTITUTIONAL WORKSPACE</small>
+          </div>
+        </div>
+
+        <h2>{{ isSignUp() ? 'Create your analyst account' : 'Welcome back' }}</h2>
+        <p class="subtitle">{{ isSignUp() ? 'Start exploring grounded financial intelligence.' : 'Sign in to access your models and research memory.' }}</p>
+
+        @if (errorMessage()) {
+          <div class="error-banner">{{ errorMessage() }}</div>
+        }
+
+        <form (ngSubmit)="submit()" class="auth-form">
+          @if (isSignUp()) {
+            <label>
+              <span>Full Name</span>
+              <input type="text" [(ngModel)]="fullName" name="fullName" placeholder="Jane Doe" required />
+            </label>
+          }
+
+          <label>
+            <span>Email</span>
+            <input type="email" [(ngModel)]="email" name="email" placeholder="analyst@finsight.ai" required />
+          </label>
+
+          <label>
+            <span>Password</span>
+            <input type="password" [(ngModel)]="password" name="password" placeholder="••••••••" required />
+          </label>
+
+          <button type="submit" class="primary-button" [disabled]="loading()">
+            {{ loading() ? 'Authenticating...' : (isSignUp() ? 'Create Account' : 'Sign In') }}
+          </button>
+        </form>
+
+        <div class="toggle-mode">
+          @if (isSignUp()) {
+            <span>Already have an account?</span>
+            <button class="link-btn" (click)="toggleMode()">Sign In</button>
+          } @else {
+            <span>Need an account?</span>
+            <button class="link-btn" (click)="toggleMode()">Create Account</button>
+          }
+        </div>
+      </div>
+    </div>

@@ -2,6 +2,7 @@ package com.finsight.backend.rag;
 
 import com.finsight.backend.ai.AIResponse;
 import com.finsight.backend.ai.ModelRouter;
+import com.finsight.backend.auth.SecurityUtils;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -16,25 +17,35 @@ public class RagService {
 
     private final VectorStore vectorStore;
     private final ModelRouter modelRouter;
+    private final SecurityUtils securityUtils;
 
-    public RagService(VectorStore vectorStore, ModelRouter modelRouter) {
+    public RagService(VectorStore vectorStore, ModelRouter modelRouter, SecurityUtils securityUtils) {
         this.vectorStore = vectorStore;
         this.modelRouter = modelRouter;
+        this.securityUtils = securityUtils;
     }
 
     public RAGResponse answer(String question) {
+        String userId = securityUtils.getCurrentUserIdString();
+        FilterExpressionBuilder b = new FilterExpressionBuilder();
 
-        List<Document> documents = vectorStore.similaritySearch(question);
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query(question)
+                .topK(5)
+                .filterExpression(b.eq("uploaded_by", userId).build())
+                .build();
+
+        List<Document> documents = vectorStore.similaritySearch(searchRequest);
 
         if (documents == null || documents.isEmpty()) {
             return new RAGResponse(
-                    "I could not find relevant information in the available documents.",
+                    "I could not find relevant information in your available documents.",
                     null,
                     List.of()
             );
         }
 
-        List<Document> relevantDocuments=documents.stream()
+        List<Document> relevantDocuments = documents.stream()
                 .limit(5)
                 .toList();
 
@@ -60,13 +71,13 @@ public class RagService {
                 %s
                 """.formatted(context, question);
 
-        AIResponse aiResponse=modelRouter.generateWithFallback(prompt);
+        AIResponse aiResponse = modelRouter.generateWithFallback(prompt);
 
-        List<SourceReference> sources=relevantDocuments.stream()
+        List<SourceReference> sources = relevantDocuments.stream()
                 .map(document -> new SourceReference(
                         (String) document.getMetadata().get("document"),
-                        getIntegerMetadata(document,"page"),
-                        getIntegerMetadata(document,"chunk_index")
+                        getIntegerMetadata(document, "page"),
+                        getIntegerMetadata(document, "chunk_index")
                 ))
                 .toList();
 
@@ -77,70 +88,82 @@ public class RagService {
         );
     }
 
-    private Integer getIntegerMetadata(Document document, String key){
-        Object value=document.getMetadata().get(key);
-        if(value instanceof Number number){
+    private Integer getIntegerMetadata(Document document, String key) {
+        Object value = document.getMetadata().get(key);
+        if (value instanceof Number number) {
             return number.intValue();
         }
         return null;
     }
 
-    public RagContext retrieve(String question){
-        List<Document> documents=vectorStore.similaritySearch(question);
-        if(documents==null || documents.isEmpty()){
-            return new RagContext(
-                    "",
-                    List.of()
-            );
-        }
+    public RagContext retrieve(String question) {
+        String userId = securityUtils.getCurrentUserIdString();
+        FilterExpressionBuilder b = new FilterExpressionBuilder();
 
-        List<Document> relevantDocuments=documents.stream()
-                .limit(5)
-                .toList();
-
-        String context=relevantDocuments.stream()
-                .map(Document::getText)
-                .collect(Collectors.joining("\n\n---\n\n"));
-
-        List<SourceReference> sources=relevantDocuments.stream()
-                .map(document -> new SourceReference(
-                        (String) document.getMetadata().get("document"),
-                        getIntegerMetadata(document,"page"),
-                        getIntegerMetadata(document,"chunk_index")
-                )).toList();
-
-        return new RagContext(
-                context,
-                sources
-        );
-    }
-
-    public RagContext retrieveForCompany(String question, String company, Integer year){
-        FilterExpressionBuilder b=new FilterExpressionBuilder();
-        var filterExpression=year!=null?b.and(b.eq("company",company), b.eq("year",year)).build(): b.eq("company",company).build();
-
-        SearchRequest request= SearchRequest.builder()
+        SearchRequest request = SearchRequest.builder()
                 .query(question)
-                .topK(4)
-                .filterExpression(filterExpression)
+                .topK(5)
+                .filterExpression(b.eq("uploaded_by", userId).build())
                 .build();
 
-        List<Document> documents=vectorStore.similaritySearch(request);
-        if(documents==null || documents.isEmpty()){
+        List<Document> documents = vectorStore.similaritySearch(request);
+        if (documents == null || documents.isEmpty()) {
             return new RagContext("", List.of());
         }
 
-        String context=documents.stream()
+        List<Document> relevantDocuments = documents.stream()
+                .limit(5)
+                .toList();
+
+        String context = relevantDocuments.stream()
                 .map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
-        List<SourceReference> sources=documents.stream()
+        List<SourceReference> sources = relevantDocuments.stream()
                 .map(document -> new SourceReference(
                         (String) document.getMetadata().get("document"),
-                        getIntegerMetadata(document,"page"),
-                        getIntegerMetadata(document,"chunk_index")
+                        getIntegerMetadata(document, "page"),
+                        getIntegerMetadata(document, "chunk_index")
                 )).toList();
 
-        return new RagContext(context,sources);
+        return new RagContext(context, sources);
+    }
+
+    public RagContext retrieveForCompany(String question, String company, Integer year) {
+        return retrieveForCompany(question, company, year, 4);
+    }
+
+    public RagContext retrieveForCompany(String question, String company, Integer year, int topK) {
+        String userId = securityUtils.getCurrentUserIdString();
+        FilterExpressionBuilder b = new FilterExpressionBuilder();
+
+        // Enforce user isolation combined with company and optional year
+        var filterExpression = (year != null)
+                ? b.and(b.eq("uploaded_by", userId), b.and(b.eq("company", company), b.eq("year", year))).build()
+                : b.and(b.eq("uploaded_by", userId), b.eq("company", company)).build();
+
+        SearchRequest request = SearchRequest.builder()
+                .query(question)
+                .topK(topK)
+                .filterExpression(filterExpression)
+                .build();
+
+        List<Document> documents = vectorStore.similaritySearch(request);
+        if (documents == null || documents.isEmpty()) {
+            return new RagContext("", List.of());
+        }
+
+        String context = documents.stream()
+                .map(Document::getText)
+                .collect(Collectors.joining("\n\n---\n\n"));
+
+        List<SourceReference> sources = documents.stream()
+                .map(document -> new SourceReference(
+                        (String) document.getMetadata().get("document"),
+                        getIntegerMetadata(document, "page"),
+                        getIntegerMetadata(document, "chunk_index")
+                )).toList();
+
+        return new RagContext(context, sources);
     }
 }
