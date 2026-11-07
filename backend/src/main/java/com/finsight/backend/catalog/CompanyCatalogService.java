@@ -1,6 +1,7 @@
 package com.finsight.backend.catalog;
 
 import com.finsight.backend.auth.SecurityUtils;
+import com.finsight.backend.tearsheet.TearSheetCacheService;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,12 @@ public class CompanyCatalogService {
 
     private final JdbcClient jdbcClient;
     private final SecurityUtils securityUtils;
+    private final TearSheetCacheService cacheService;
 
-    public CompanyCatalogService(JdbcClient jdbcClient, SecurityUtils securityUtils) {
+    public CompanyCatalogService(JdbcClient jdbcClient, SecurityUtils securityUtils, TearSheetCacheService cacheService) {
         this.jdbcClient = jdbcClient;
         this.securityUtils = securityUtils;
+        this.cacheService = cacheService;
     }
 
     public List<CompanySummaryDTO> getTrackedCompanies() {
@@ -75,16 +78,19 @@ public class CompanyCatalogService {
     public int deleteCompany(String company) {
         String userId = securityUtils.getCurrentUserIdString();
 
-        // Ensure a user can only delete their own uploaded company data
         String sql = """
             DELETE FROM vector_store
             WHERE metadata->>'uploaded_by' = :userId
               AND metadata->>'company' = :company
         """;
 
-        return jdbcClient.sql(sql)
+        int deletedRows = jdbcClient.sql(sql)
                 .param("userId", userId)
                 .param("company", company)
                 .update();
+
+        cacheService.evictUserCompany(userId, company);
+
+        return deletedRows;
     }
 }
