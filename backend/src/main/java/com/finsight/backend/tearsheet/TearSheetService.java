@@ -1,85 +1,104 @@
 package com.finsight.backend.tearsheet;
 
+import com.finsight.backend.auth.SecurityUtils;
 import com.finsight.backend.mcp.AgentResult;
 import com.finsight.backend.mcp.McpAgentService;
 import com.finsight.backend.rag.RagContext;
 import com.finsight.backend.rag.RagService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class TearSheetService {
 
+    private static final Logger log = LoggerFactory.getLogger(TearSheetService.class);
+
     private final RagService ragService;
     private final McpAgentService mcpAgentService;
+    private final SecurityUtils securityUtils;
+    private final TearSheetCacheService cacheService;
 
-    public TearSheetService(RagService ragService, McpAgentService mcpAgentService) {
+    public TearSheetService(
+            RagService ragService,
+            McpAgentService mcpAgentService,
+            SecurityUtils securityUtils,
+            TearSheetCacheService cacheService
+    ) {
         this.ragService = ragService;
         this.mcpAgentService = mcpAgentService;
+        this.securityUtils = securityUtils;
+        this.cacheService = cacheService;
     }
 
     public TearSheetResponse generateTearSheet(String company, Integer year, String ticker) {
-        String ragQuery = "revenue, operating income, net income, total assets, total liabilities, equity, cash flow, debt";
-        RagContext ragContext = ragService.retrieveForCompany(ragQuery, company, year);
+        String userId = securityUtils.getCurrentUserIdString();
+
+        Optional<TearSheetResponse> cached = cacheService.get(userId, company, year);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+
+        log.info("Executing live tear sheet generation for user={}, company={}, year={}", userId, company, year);
+
+        String ragQuery = "Consolidated Statements of Operations Balance Sheet total revenue net income assets liabilities debt";
+        RagContext ragContext = ragService.retrieveForCompany(ragQuery, company, year, 3);
+
+        String effectiveTicker = (ticker != null && !ticker.isBlank()) ? ticker : company;
 
         String prompt = """
                 OUTPUT DIRECTIVE:
-                - Output ONLY the final Executive Tear Sheet formatted in clean Markdown.
-                - DO NOT write any chain-of-thought, internal reasoning, draft calculations, or thoughts like "Let's compute", "Let's see", "Wait", etc.
-                - Begin your response IMMEDIATELY with the title '# Executive Tear Sheet: %s'.
+                - Output ONLY the final Executive Tear Sheet in clean Markdown.
+                - Do NOT include internal scratchpad or conversational preamble.
+                - Begin immediately with '# Executive Tear Sheet: %s'.
 
-                TASK:
-                Generate a 1-page financial tear sheet for:
-                Company: %s
-                Fiscal Period: %s
-                Ticker: %s
+                COMPANY: %s (%s)
+                TICKER: %s
 
-                Retrieved Financial Disclosures:
+                FINANCIAL DISCLOSURES FROM FILING:
                 %s
 
-                EXECUTION STEPS:
-                1. Market Data: Invoke 'getLiveMarketQuote' for ticker '%s' if applicable.
-                2. Fundamental Metrics: Invoke MCP tools ('profitMargin', 'debtToEquity', 'dupontAnalysis', 'altmanZScore').
-                   - If exact figures for Altman Z-Score or DuPont are not fully present, calculate with the closest GAAP figures available and state the footnote clearly. Do not deliberate in the output.
-                3. Market Context: Invoke 'getRecentCompanyNews' for %s.
-                4. Output Structure:
+                INSTRUCTIONS:
+                1. Identify key figures (Revenue, Net Income, Total Assets, Total Liabilities, Total Debt) from the disclosures above.
+                2. In your very first turn, invoke tools in parallel:
+                   - 'getLiveMarketQuote' for ticker '%s'
+                   - 'dupontAnalysis' or 'altmanZScore'
+                3. Immediately synthesize the outputs into this structure:
                    # Executive Tear Sheet: %s (%s)
                    ## 1. Key Fundamentals & Valuation Matrix
-                   (Markdown table: Metric | Value | Reference / Status)
+                   (Table: Metric | Value | Reference / Status)
                    ## 2. Capital Structure & Solvency Health
-                   (Altman Z-Score analysis & Debt-to-Equity evaluation)
-                   ## 3. DuPont Efficiency Decomposition
-                   (Analysis of margin vs. asset turnover vs. leverage)
-                   ## 4. Market Sentiment & Headwinds
-                   (Bullet points from live news)
-                   ## 5. Strategic Analyst Verdict
+                   (Altman Z-Score & leverage health evaluation)
+                   ## 3. DuPont Efficiency Breakdown
+                   ## 4. Strategic Analyst Verdict
                 """.formatted(
                 company,
                 company,
-                year != null ? year : "Latest Available",
-                ticker != null && !ticker.isBlank() ? ticker : company,
+                year != null ? year : "Latest",
+                effectiveTicker,
                 ragContext.context(),
-                ticker != null && !ticker.isBlank() ? ticker : company,
-                company,
+                effectiveTicker,
                 company,
                 year != null ? year : "FY"
         );
 
         AgentResult result = mcpAgentService.ask(prompt);
-
-        // Clean up any stray internal thoughts if the model still emits leading text
         String cleanedResponse = stripScratchpad(result.response());
 
-        return new TearSheetResponse(company, year, cleanedResponse, result.provider());
+        TearSheetResponse response = new TearSheetResponse(company, year, cleanedResponse, result.provider());
+
+        // 3. Populate Redis Cache
+        cacheService.put(userId, company, year, response);
+
+        return response;
     }
 
-    /**
-     * Defense-in-depth: If the LLM produces thinking text before the title,
-     * strip everything prior to the first Markdown header '# '.
-     */
     private String stripScratchpad(String response) {
         if (response == null) return "";
         int headerIndex = response.indexOf("# ");
-        if (headerIndex > 0) {
+        if (headerIndex >= 0) {
             return response.substring(headerIndex).trim();
         }
         return response.trim();
