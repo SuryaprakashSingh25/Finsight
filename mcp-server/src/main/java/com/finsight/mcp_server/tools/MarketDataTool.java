@@ -66,7 +66,7 @@ public class MarketDataTool {
                     fiftyTwoWeekHigh,
                     currency,
                     regularMarketVolume
-            );
+            ).trim();
         } catch (Exception e) {
             log.error("Failed to fetch live quote for ticker {}", symbol, e);
             return "Unable to retrieve live market quote for " + symbol + ": " + e.getMessage();

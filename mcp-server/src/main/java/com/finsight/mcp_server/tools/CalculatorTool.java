@@ -73,7 +73,14 @@ public class CalculatorTool {
                     "Formula: 1.2*(workingCapital/totalAssets) + 1.4*(retainedEarnings/totalAssets) + 3.3*(ebit/totalAssets) + 0.6*(marketValueOfEquity/totalLiabilities) + 0.999*(sales/totalAssets). " +
                     "Z > 2.99 = Safe Zone, 1.81 <= Z <= 2.99 = Grey Zone, Z < 1.81 = Distress Zone."
     )
-    public double altmanZScore(double workingCapital, double retainedEarnings, double ebit, double marketValueOfEquity, double sales, double totalAssets, double totalLiabilities
+    public double altmanZScore(
+            double workingCapital,
+            double retainedEarnings,
+            double ebit,
+            double marketValueOfEquity,
+            double sales,
+            double totalAssets,
+            double totalLiabilities
     ) {
         log.info("MCP TOOL: altmanZScore invoked for assets={}, liabilities={}", totalAssets, totalLiabilities);
         if (totalAssets <= 0 || totalLiabilities <= 0) {
@@ -94,8 +101,7 @@ public class CalculatorTool {
             description = "Perform a DuPont 3-Step ROE Decomposition to determine whether returns stem from margins, asset efficiency, or leverage. " +
                     "Returns a structured breakdown: Profit Margin (netIncome/revenue), Asset Turnover (revenue/totalAssets), Equity Multiplier (totalAssets/shareholdersEquity), and resulting ROE."
     )
-    public String dupontAnalysis(double netIncome, double revenue, double totalAssets, double shareholdersEquity
-    ) {
+    public String dupontAnalysis(double netIncome, double revenue, double totalAssets, double shareholdersEquity) {
         log.info("MCP TOOL: dupontAnalysis for revenue={}, equity={}", revenue, shareholdersEquity);
         if (revenue <= 0 || totalAssets <= 0 || shareholdersEquity <= 0) {
             throw new IllegalArgumentException("Revenue, Total Assets, and Equity must be strictly positive non-zero values.");
@@ -112,6 +118,6 @@ public class CalculatorTool {
                 - Asset Turnover: %.2fx (Asset utilization)
                 - Equity Multiplier (Leverage): %.2fx (Financial leverage)
                 - Calculated ROE: %.2f%%
-                """.formatted(profitMargin, assetTurnover, equityMultiplier, roe);
+                """.formatted(profitMargin, assetTurnover, equityMultiplier, roe).trim();
     }
 }

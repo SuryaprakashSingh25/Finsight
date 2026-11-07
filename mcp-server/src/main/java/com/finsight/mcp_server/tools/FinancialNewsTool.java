@@ -28,7 +28,6 @@ public class FinancialNewsTool {
         log.info("MCP TOOL: getRecentCompanyNews for '{}'", companyOrTicker);
 
         try {
-            // Encode query for Google News Financial RSS
             String query = URLEncoder.encode(companyOrTicker + " stock financial earnings", StandardCharsets.UTF_8);
             String feedUrl = "https://news.google.com/rss/search?q=" + query + "&hl=en-US&gl=US&ceid=US:en";
 
@@ -55,8 +54,8 @@ public class FinancialNewsTool {
                                 entry.getPublishedDate() != null ? entry.getPublishedDate().toString() : "Recent",
                                 entry.getSource() != null ? entry.getSource().getTitle() : "Financial News",
                                 entry.getLink()
-                        ))
-                        .collect(Collectors.joining("\n"));
+                        ).trim())
+                        .collect(Collectors.joining("\n\n"));
             }
         } catch (Exception ex) {
             log.error("Failed to fetch RSS news for {}", companyOrTicker, ex);
